@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Sesión Cerrada - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body py-5">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    <h2 class="mt-4 mb-3">¡Gracias por utilizar Canicross!</h2>
+                    <p class="lead mb-4">Has cerrado sesión correctamente.</p>
+                    
+                    <div class="mt-5">
+                        <a href="{% url 'events:event_list' %}" class="btn btn-primary">Ver eventos disponibles</a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary ms-2">Iniciar Sesión</a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3">
+                    <p class="mb-0">¿Tienes alguna pregunta? Contáctanos a <a href="mailto:info@canicross.es">info@canicross.es</a></p>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h4>Próximos eventos destacados</h4>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Canicross Primavera</h5>
+                                <p class="text-muted">10-12 Mayo 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Mountain Canicross</h5>
+                                <p class="text-muted">24-26 Junio 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Canicross Verano</h5>
+                                <p class="text-muted">15-17 Julio 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

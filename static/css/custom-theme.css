@@ -1,0 +1,204 @@
+/**
+ * Tema personalizado para Canicross
+ * Tema: Anaranjado (R:192, G:90, B:55)
+ */
+
+:root {
+    --primary-color: #c05a37; /* Color anaranjado principal (R:192, G:90, B:55) */
+    --primary-dark: #9d472c; /* Versión más oscura del anaranjado para hover */
+    --primary-light: #d67b59; /* Versión más clara del anaranjado para fondos */
+    --primary-very-light: #f3d8ce; /* Versión muy clara para fondos sutiles */
+    
+    /* Colores complementarios que hacen juego con el anaranjado */
+    --accent-color: #37a0c0; /* Azul turquesa que complementa bien el anaranjado */
+    --accent-dark: #2c829d; /* Versión más oscura del turquesa */
+    --accent-light: #59bfd6; /* Versión más clara del turquesa */
+    
+    /* Paleta de colores armoniosa */
+    --neutral-warm: #e0c3b6; /* Tono cálido neutral */
+    --neutral-cool: #b6cde0; /* Tono frío neutral */
+    
+    /* Colores estándar */
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+}
+
+/* Sobreescribir clases de Bootstrap para usar el color anaranjado */
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.bg-primary-light {
+    background-color: var(--primary-light) !important;
+}
+
+.bg-primary-very-light {
+    background-color: var(--primary-very-light) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    box-shadow: 0 0 8px rgba(192, 90, 55, 0.5) !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 0 8px rgba(192, 90, 55, 0.5) !important;
+}
+
+/* Estilo especial para botones outline-primary en estado activo */
+.btn-outline-primary.active {
+    background-color: white !important;
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Botones secundarios con el color complementario */
+.btn-secondary {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+.btn-secondary:hover {
+    background-color: var(--accent-dark) !important;
+    border-color: var(--accent-dark) !important;
+    box-shadow: 0 0 8px rgba(55, 160, 192, 0.5) !important;
+}
+
+.btn-outline-secondary {
+    color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--accent-color) !important;
+    color: white !important;
+    box-shadow: 0 0 8px rgba(55, 160, 192, 0.5) !important;
+}
+
+/* Estilo para botones de acción flotantes */
+.btn-float {
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.btn-float:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-color) !important;
+}
+
+a {
+    color: var(--primary-color);
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.pagination .page-link {
+    color: var(--primary-color) !important;
+}
+
+/* Ajuste para las pestañas en las páginas de detalles */
+.nav-tabs .nav-link.active:after {
+    background-color: var(--primary-color) !important;
+}
+
+/* Ajuste para todas las referencias al color anterior en los gradientes */
+.event-header-bg, .event-header {
+    background-image: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+}
+
+/* Personalización de la barra de navegación */
+.navbar-dark {
+    background-color: var(--primary-color) !important;
+}
+
+/* Estilos para tarjetas */
+.card-header.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Estilos para insignias y etiquetas */
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Estilos para alertas */
+.alert-primary {
+    background-color: var(--primary-very-light) !important;
+    border-color: var(--primary-light) !important;
+    color: var(--primary-dark) !important;
+}
+
+/* Estilos para elementos de lista */
+.list-group-item.active {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* Estilos para inputs */
+.form-control:focus {
+    border-color: var(--primary-light) !important;
+    box-shadow: 0 0 0 0.25rem rgba(192, 90, 55, 0.25) !important;
+}
+
+/* Estilos para dropdowns */
+.dropdown-item:active {
+    background-color: var(--primary-color) !important;
+}
+
+/* Estilos para tooltips */
+.tooltip-inner {
+    background-color: var(--primary-color) !important;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: var(--primary-color) !important;
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: var(--primary-color) !important;
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: var(--primary-color) !important;
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: var(--primary-color) !important;
+}

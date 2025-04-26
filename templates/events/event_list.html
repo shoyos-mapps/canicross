@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Eventos de Canicross{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+<style>
+    /* Estilos específicos para la página de eventos */
+    .events-hero-section {
+        background-image: url('{% static "images/runner_dog_scaled_down_right_position.jpg" %}');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        color: white;
+        padding: 5rem 0;
+        height: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .events-hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .events-hero-section h1 {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .events-hero-section p {
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    .event-card {
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .event-card .card-img-overlay {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .event-card:hover .card-img-overlay {
+        opacity: 1;
+    }
+    
+    .event-header {
+        position: relative;
+        overflow: hidden;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+    
+    .event-header-bg {
+        background-color: var(--primary-color);
+        background-image: linear-gradient(45deg, var(--primary-color), #9d472c);
+        height: 80px;
+        position: relative;
+    }
+    
+    .event-badge {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+    
+    /* Animación para las tarjetas */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .animated-card {
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+    }
+    
+    /* Ajustes responsive para móviles */
+    @media (max-width: 767.98px) {
+        .events-hero-section {
+            padding: 1rem 0;
+            height: 250px;
+            background-position: center center;
+        }
+        
+        .events-hero-section::before {
+            background-color: rgba(0, 0, 0, 0.5); /* Un poco más oscuro en móviles para mejor contraste */
+        }
+        
+        .events-hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .events-hero-section .lead {
+            font-size: 1rem;
+        }
+        
+        .event-meta-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .race-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .card-footer-mobile {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .card-footer-mobile > *:first-child {
+            margin-bottom: 0.5rem;
+        }
+    }
+    
+    /* Estilos para tablets */
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .events-hero-section {
+            padding: 2rem 0;
+            height: 300px;
+        }
+        
+        .event-card .card-title {
+            font-size: 1.1rem;
+        }
+    }
+    
+    /* Estilos para pantallas grandes */
+    @media (min-width: 1200px) {
+        .events-hero-section {
+            height: 400px;
+        }
+    }
+    
+    /* Loader animado para búsqueda futura */
+    .event-loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+    }
+    
+    .event-loader .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="events-hero-section py-5 text-center rounded-3 mb-4">
+    <div class="container position-relative" style="z-index: 10;">
+        <h1 class="display-5 fw-bold text-white">Eventos de Canicross</h1>
+        <div class="col-lg-8 mx-auto">
+            <p class="lead mb-4 text-white">Encuentra y participa en los mejores eventos de Canicross con tu perro.</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="#eventos-proximos" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="bi bi-arrow-down-circle me-2"></i>Ver eventos
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Lista de Eventos -->
+<div class="container" id="eventos-proximos">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">Próximos Eventos</h2>
+            <span class="badge bg-light text-primary">{{ events|length }} eventos</span>
+        </div>
+        <div class="card-body">
+            {% if events %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for event in events %}
+                        <div class="col" style="animation-delay: {{ forloop.counter0|divisibleby:3 }}00ms">
+                            <div class="card h-100 shadow-sm animated-card event-card">
+                                <!-- Header con efecto degradado -->
+                                <div class="event-header">
+                                    <div class="event-header-bg"></div>
+                                    <div class="event-badge">
+                                        <span class="badge rounded-pill {% if event.status == 'registration_open' %}bg-success{% elif event.status == 'in_progress' %}bg-primary{% elif event.status == 'completed' %}bg-secondary{% elif event.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %} px-3 py-2 shadow-sm">
+                                            {{ event.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary mb-3">{{ event.name }}</h5>
+                                    
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <div class="event-meta-item d-flex align-items-center">
+                                            <i class="bi bi-calendar-event text-primary me-2"></i>
+                                            <small>{{ event.start_date|date:"d/m/Y" }}</small>
+                                        </div>
+                                        <div class="event-meta-item d-flex align-items-center">
+                                            <i class="bi bi-geo-alt text-danger me-2"></i>
+                                            <small>{{ event.location }}</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text mb-3">{{ event.description|truncatewords:15 }}</p>
+                                    
+                                    {% if event.races.all %}
+                                        <div class="mb-3 race-list">
+                                            <strong class="d-block mb-2">
+                                                <i class="bi bi-trophy-fill text-warning me-1"></i>
+                                                Carreras:
+                                            </strong>
+                                            <ul class="list-group list-group-flush">
+                                                {% for race in event.races.all %}
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1 border-0">
+                                                        <span>{{ race.name }}</span>
+                                                        <span class="badge bg-light text-dark">{{ race.race_date|date:"d/m/Y" }}</span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex flex-column gap-2 mt-auto">
+                                        <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-info-circle me-2"></i> Ver Detalles
+                                        </a>
+                                        {% if event.status == 'registration_open' %}
+                                            <a href="{% url 'events:event_register' event.slug %}" class="btn btn-sm btn-success d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-pencil-square me-2"></i> Inscribirse
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer d-flex justify-content-between align-items-center card-footer-mobile">
+                                    <small class="text-muted d-flex align-items-center">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Inscripciones hasta: {{ event.registration_end|date:"d/m/Y" }}
+                                    </small>
+                                    
+                                    <div class="d-flex align-items-center mobile-stack">
+                                        <span class="badge bg-light text-primary me-1">
+                                            <i class="bi bi-people-fill me-1"></i>{{ event.races.count }} carreras
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center py-5">
+                    <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+                    <h4>No hay eventos programados</h4>
+                    <p class="mb-0">Actualmente no hay eventos próximos programados. Por favor, vuelva a consultar más tarde.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Script para animar la aparición de las tarjetas al hacer scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aplicar animación inmediata a las tarjetas visibles
+        document.querySelectorAll('.animated-card').forEach(function(card, index) {
+            setTimeout(function() {
+                card.style.animationDelay = (index * 100) + 'ms';
+                card.style.opacity = '1';
+            }, 100);
+        });
+        
+        // Mejorar la experiencia táctil en móviles
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                card.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

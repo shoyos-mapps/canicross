@@ -1,0 +1,545 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.name }} - Canicross{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos específicos para la página de detalle de evento */
+    .event-header {
+        background-color: var(--primary-color);
+        background-image: linear-gradient(135deg, var(--primary-color), #9d472c);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    }
+    
+    .event-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .event-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .event-meta-item {
+        display: flex;
+        align-items: center;
+        background-color: rgba(255,255,255,0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+    }
+    
+    .event-meta-item i {
+        margin-right: 0.5rem;
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .section-title i {
+        margin-right: 0.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .info-card {
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+        height: 100%;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    }
+    
+    .info-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .info-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .info-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .info-list i {
+        margin-right: 0.75rem;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-top: 0.2rem;
+    }
+    
+    .document-item, .vaccine-item {
+        display: flex;
+        align-items: center;
+    }
+    
+    .document-item i, .vaccine-item i {
+        margin-right: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    /* Estilos responsive */
+    @media (max-width: 767.98px) {
+        .event-header {
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .event-meta {
+            justify-content: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .action-buttons .btn {
+            width: 100%;
+        }
+        
+        .card-mobile-stack + .card-mobile-stack {
+            margin-top: 1rem;
+        }
+        
+        .order-mobile-1 {
+            order: 1;
+        }
+        
+        .order-mobile-2 {
+            order: 2;
+        }
+        
+        .order-mobile-3 {
+            order: 3;
+        }
+    }
+    
+    /* Efecto para las pestañas */
+    .nav-tabs .nav-link {
+        border: none;
+        color: var(--secondary-color);
+        font-weight: 500;
+        position: relative;
+    }
+    
+    .nav-tabs .nav-link:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary-color);
+        transition: width 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+        border: none;
+    }
+    
+    .nav-tabs .nav-link.active:after {
+        width: 100%;
+    }
+    
+    /* Animación para los paneles de pestañas */
+    .tab-pane {
+        animation: fadeIn 0.5s ease;
+    }
+    
+    /* Soporte táctil para móviles */
+    @media (hover: none) {
+        .info-card {
+            transform: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Cabecera del evento con diseño atractivo -->
+<div class="event-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-5 fw-bold mb-3">{{ event.name }}</h1>
+                
+                <div class="event-meta">
+                    <div class="event-meta-item">
+                        <i class="bi bi-calendar-event"></i>
+                        {{ event.start_date|date:"d/m/Y" }} - {{ event.end_date|date:"d/m/Y" }}
+                    </div>
+                    <div class="event-meta-item">
+                        <i class="bi bi-geo-alt"></i>
+                        {{ event.location }}
+                    </div>
+                    <div class="event-meta-item">
+                        <i class="bi bi-trophy"></i>
+                        {{ event.races.count }} carreras
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
+                <span class="badge event-badge rounded-3 {% if event.status == 'registration_open' %}bg-success{% elif event.status == 'in_progress' %}bg-primary{% elif event.status == 'completed' %}bg-secondary{% elif event.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                    {{ event.get_status_display }}
+                </span>
+                
+                <div class="mt-3 action-buttons">
+                    {% if event.status == 'registration_open' %}
+                    <a href="{% url 'events:event_register' event.slug %}" class="btn btn-success btn-lg">
+                        <i class="bi bi-pencil-square me-2"></i>Inscribirse
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenido principal con sistema de pestañas responsive -->
+<div class="container mb-5">
+    <!-- Pestañas para navegación en móvil -->
+    <ul class="nav nav-tabs mb-4 d-md-none" id="eventTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
+                <i class="bi bi-info-circle"></i> Info
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="races-tab" data-bs-toggle="tab" data-bs-target="#races" type="button" role="tab" aria-controls="races" aria-selected="false">
+                <i class="bi bi-trophy"></i> Carreras
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rules-tab" data-bs-toggle="tab" data-bs-target="#rules" type="button" role="tab" aria-controls="rules" aria-selected="false">
+                <i class="bi bi-book"></i> Reglas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                <i class="bi bi-telephone"></i> Contacto
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Contenido de pestañas (solo visible en móvil) -->
+    <div class="tab-content d-md-none mb-4" id="eventTabContent">
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title"><i class="bi bi-info-circle"></i> Descripción</h5>
+                    <p>{{ event.description|linebreaks }}</p>
+                    
+                    <h5 class="section-title mt-4"><i class="bi bi-calendar-check"></i> Inscripciones</h5>
+                    <ul class="info-list">
+                        <li><i class="bi bi-calendar-plus"></i> <strong>Apertura:</strong> {{ event.registration_start|date:"d/m/Y H:i" }}</li>
+                        <li><i class="bi bi-calendar-x"></i> <strong>Cierre:</strong> {{ event.registration_end|date:"d/m/Y H:i" }}</li>
+                    </ul>
+                    
+                    {% if event.required_documents or event.required_vaccines %}
+                    <h5 class="section-title mt-4"><i class="bi bi-file-earmark-check"></i> Requisitos</h5>
+                    
+                    {% if event.required_documents %}
+                    <h6 class="mt-3">Documentos necesarios:</h6>
+                    <ul class="info-list">
+                        {% for doc in event.required_documents %}
+                        <li class="document-item"><i class="bi bi-file-earmark-text"></i> {{ doc }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    
+                    {% if event.required_vaccines %}
+                    <h6 class="mt-3">Vacunas requeridas:</h6>
+                    <ul class="info-list">
+                        {% for vaccine in event.required_vaccines %}
+                        <li class="vaccine-item"><i class="bi bi-shield-check"></i> {{ vaccine }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="races" role="tabpanel" aria-labelledby="races-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title"><i class="bi bi-trophy"></i> Carreras disponibles</h5>
+                    <div class="mb-3">
+                        {% if event.races.all %}
+                        <div class="list-group">
+                            {% for race in event.races.all %}
+                            <a href="{% url 'events:race_detail' event.slug race.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ race.name }}</h6>
+                                    <small>{{ race.race_date|date:"d/m/Y" }} - {{ race.modality.name }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ race.distance }} km</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Aún no hay carreras definidas para este evento.
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'events:race_list' event.slug %}" class="btn btn-primary">
+                            <i class="bi bi-list-check me-2"></i>Ver todas las carreras
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="rules" role="tabpanel" aria-labelledby="rules-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title"><i class="bi bi-book"></i> Reglamento</h5>
+                    {% if event.rules %}
+                    <div>
+                        {{ event.rules|linebreaks }}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        El reglamento estará disponible próximamente.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="section-title"><i class="bi bi-telephone"></i> Información de contacto</h5>
+                    <ul class="info-list">
+                        <li><i class="bi bi-envelope"></i> info@canicross.es</li>
+                        <li><i class="bi bi-telephone"></i> +34 912 345 678</li>
+                    </ul>
+                    
+                    <h5 class="section-title mt-4"><i class="bi bi-exclamation-triangle"></i> Información importante</h5>
+                    <ul class="info-list">
+                        <li><i class="bi bi-exclamation-circle"></i> Recuerde traer la documentación veterinaria requerida.</li>
+                        <li><i class="bi bi-clock"></i> La recogida de dorsales comienza 2 horas antes de cada carrera.</li>
+                        <li><i class="bi bi-shield-check"></i> Se realizarán controles veterinarios previos a la competición.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Diseño para desktop (MD y superiores) -->
+    <div class="row d-none d-md-flex">
+        <!-- Columna principal -->
+        <div class="col-md-8">
+            <div class="card mb-4 info-card">
+                <div class="card-body">
+                    <h5 class="section-title"><i class="bi bi-info-circle"></i> Descripción</h5>
+                    <p>{{ event.description|linebreaks }}</p>
+                    
+                    <h5 class="section-title mt-4"><i class="bi bi-calendar-check"></i> Inscripciones</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="info-list">
+                                <li><i class="bi bi-calendar-plus"></i> <strong>Apertura:</strong> {{ event.registration_start|date:"d/m/Y H:i" }}</li>
+                                <li><i class="bi bi-calendar-x"></i> <strong>Cierre:</strong> {{ event.registration_end|date:"d/m/Y H:i" }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-light h-100">
+                                <div class="card-body bg-light rounded">
+                                    <h6 class="mb-3"><i class="bi bi-calendar-event text-primary me-2"></i>Calendario del evento</h6>
+                                    <ul class="info-list">
+                                        <li><i class="bi bi-calendar-check"></i> <strong>Inicio:</strong> {{ event.start_date|date:"d/m/Y" }}</li>
+                                        <li><i class="bi bi-calendar-x"></i> <strong>Fin:</strong> {{ event.end_date|date:"d/m/Y" }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons mt-4">
+                        {% if event.status == 'registration_open' %}
+                        <a href="{% url 'events:event_register' event.slug %}" class="btn btn-success">
+                            <i class="bi bi-pencil-square me-2"></i>Inscribirse
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'events:race_list' event.slug %}" class="btn btn-primary">
+                            <i class="bi bi-list-check me-2"></i>Ver carreras
+                        </a>
+                        <a href="{% url 'events:event_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Volver a eventos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                {% if event.required_documents %}
+                <div class="col-md-6">
+                    <div class="card mb-4 info-card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0 text-primary"><i class="bi bi-file-earmark-check me-2"></i>Documentos requeridos</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                {% for doc in event.required_documents %}
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                                    {{ doc }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if event.required_vaccines %}
+                <div class="col-md-6">
+                    <div class="card mb-4 info-card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0 text-primary"><i class="bi bi-shield-check me-2"></i>Vacunas requeridas</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                {% for vaccine in event.required_vaccines %}
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-shield-plus text-success me-2"></i>
+                                    {{ vaccine }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if event.rules %}
+            <div class="card mb-4 info-card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary"><i class="bi bi-book me-2"></i>Reglamento</h5>
+                </div>
+                <div class="card-body">
+                    {{ event.rules|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Columna lateral -->
+        <div class="col-md-4">
+            <div class="card mb-4 info-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Carreras</h5>
+                </div>
+                <div class="card-body">
+                    {% if event.races.all %}
+                    <div class="list-group list-group-flush">
+                        {% for race in event.races.all %}
+                        <a href="{% url 'events:race_detail' event.slug race.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0 py-2 border-bottom">
+                            <div>
+                                <h6 class="mb-1">{{ race.name }}</h6>
+                                <small class="text-muted d-flex align-items-center">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    {{ race.race_date|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ race.distance }} km</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-trophy fs-1 text-muted"></i>
+                        <p class="mt-3">Aún no hay carreras definidas para este evento.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'events:race_list' event.slug %}" class="btn btn-outline-primary d-block">
+                        <i class="bi bi-list-check me-2"></i>Ver todas las carreras
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card mb-4 info-card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Información importante</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="info-list">
+                        <li><i class="bi bi-exclamation-circle"></i> Recuerde traer la documentación veterinaria requerida.</li>
+                        <li><i class="bi bi-clock"></i> La recogida de dorsales comienza 2 horas antes de cada carrera.</li>
+                        <li><i class="bi bi-shield-check"></i> Se realizarán controles veterinarios previos a la competición.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card info-card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-telephone me-2"></i>Información de contacto</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="info-list">
+                        <li><i class="bi bi-envelope"></i> info@canicross.es</li>
+                        <li><i class="bi bi-telephone"></i> +34 912 345 678</li>
+                        <li><i class="bi bi-geo-alt"></i> {{ event.location }}</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="mailto:info@canicross.es" class="btn btn-outline-info">
+                            <i class="bi bi-envelope me-2"></i>Contactar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Solo para dispositivos táctiles
+        if ('ontouchstart' in window) {
+            // Mejorar la experiencia táctil en móviles
+            document.querySelectorAll('.info-card').forEach(card => {
+                card.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                card.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

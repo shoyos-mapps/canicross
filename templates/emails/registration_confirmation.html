@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Inscripción - {{ event.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #0066cc;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            background-color: #f5f5f5;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .details h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px dotted #eee;
+            padding-bottom: 8px;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+        .status-confirmed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .button {
+            display: inline-block;
+            background-color: #0066cc;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Confirmación de Inscripción</h1>
+    </div>
+    
+    <div class="content">
+        <p>Estimado/a <strong>{{ participant.first_name }} {{ participant.last_name }}</strong>,</p>
+        
+        <p>¡Gracias por inscribirte en nuestro evento <strong>{{ event.name }}</strong>!</p>
+        
+        <p>A continuación, te proporcionamos los detalles de tu inscripción:</p>
+        
+        <div class="details">
+            <h3>Datos del Evento</h3>
+            <div class="info-row">
+                <span class="info-label">Evento:</span>
+                <span>{{ event.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Fecha del Evento:</span>
+                <span>{{ event.start_date|date:"d/m/Y" }} - {{ event.end_date|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ubicación:</span>
+                <span>{{ event.location }}</span>
+            </div>
+        </div>
+        
+        <div class="details">
+            <h3>Datos de la Inscripción</h3>
+            <div class="info-row">
+                <span class="info-label">Carrera:</span>
+                <span>{{ race.name }} ({{ race.distance }}km)</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Modalidad:</span>
+                <span>{{ race.modality.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Categoría:</span>
+                <span>{{ category.name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Perro:</span>
+                <span>{{ dog.name }} ({{ dog.breed }})</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Precio:</span>
+                <span>{{ price }}€</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Fecha de Inscripción:</span>
+                <span>{{ registration_date|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Estado de la Inscripción:</span>
+                <span class="status {% if registration_status == 'Confirmada' %}status-confirmed{% else %}status-pending{% endif %}">
+                    {{ registration_status }}
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Estado del Pago:</span>
+                <span class="status {% if payment_status == 'Pagado' %}status-paid{% else %}status-pending{% endif %}">
+                    {{ payment_status }}
+                </span>
+            </div>
+        </div>
+        
+        {% if payment_status != 'Pagado' %}
+        <p>Para completar tu inscripción, es necesario realizar el pago correspondiente. Puedes hacerlo a través de nuestra plataforma o mediante transferencia bancaria utilizando la referencia de tu inscripción.</p>
+        
+        <div style="text-align: center;">
+            <a href="#" class="button">Realizar Pago</a>
+        </div>
+        {% endif %}
+        
+        <p>Si tienes alguna pregunta o necesitas ayuda adicional, no dudes en contactarnos respondiendo a este correo o llamando al teléfono de atención al participante.</p>
+        
+        <p>¡Te esperamos en {{ event.name }}!</p>
+        
+        <p>Saludos cordiales,<br>
+        El Equipo de Canicross</p>
+    </div>
+    
+    <div class="footer">
+        <p>Este es un mensaje automático. Por favor, no respondas a este correo.</p>
+        <p>&copy; {{ event.start_date|date:"Y" }} Canicross. Todos los derechos reservados.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block title %}{{ dog.name }} - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Mi Cuenta</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'participants:profile' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-fill"></i> Mi Perfil
+                    </a>
+                    <a href="{% url 'participants:dog_list' %}" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-heart-fill"></i> Mis Perros
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-card-checklist"></i> Mis Inscripciones
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-file-earmark-text"></i> Mis Documentos
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-trophy-fill"></i> Mis Resultados
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{{ dog.name }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'participants:dog_edit' dog.id %}" class="btn btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Editar Perro
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong>Información Básica</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-2">
+                                        <div class="col-md-4"><strong>Nombre:</strong></div>
+                                        <div class="col-md-8">{{ dog.name }}</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-md-4"><strong>Raza:</strong></div>
+                                        <div class="col-md-8">{{ dog.breed }}</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-md-4"><strong>Fecha de Nacimiento:</strong></div>
+                                        <div class="col-md-8">{{ dog.date_of_birth|date:"d/m/Y" }}</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-md-4"><strong>Género:</strong></div>
+                                        <div class="col-md-8">{{ dog.get_gender_display }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong>Información Veterinaria</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-2">
+                                        <div class="col-md-4"><strong>Nº Microchip:</strong></div>
+                                        <div class="col-md-8">{{ dog.microchip_number }}</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-md-4"><strong>Nº Cartilla Veterinaria:</strong></div>
+                                        <div class="col-md-8">{{ dog.veterinary_book_number|default:"No especificado" }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'participants:dog_list' %}" class="btn btn-outline-secondary">Volver a Mis Perros</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Historial de Carreras</h5>
+                </div>
+                <div class="card-body">
+                    {% if dog.registrations.exists %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Evento</th>
+                                    <th>Carrera</th>
+                                    <th>Fecha</th>
+                                    <th>Categoría</th>
+                                    <th>Estado</th>
+                                    <th>Posición</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registration in dog.registrations.all %}
+                                <tr>
+                                    <td>{{ registration.race.event.name }}</td>
+                                    <td>{{ registration.race.name }}</td>
+                                    <td>{{ registration.race.date|date:"d/m/Y" }}</td>
+                                    <td>{{ registration.race_category.category.name }}</td>
+                                    <td>
+                                        <span class="badge {% if registration.registration_status == 'confirmed' %}bg-success{% elif registration.registration_status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ registration.get_registration_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{% if registration.position %}{{ registration.position }}{% else %}-{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-trophy fs-1 text-muted"></i>
+                        <p class="mt-3">{{ dog.name }} aún no ha participado en ninguna carrera.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

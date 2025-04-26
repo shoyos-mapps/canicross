@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block title %}{% if action == 'edit' %}Editar Perro{% else %}Registrar Perro{% endif %} - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Mi Cuenta</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'participants:profile' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-fill"></i> Mi Perfil
+                    </a>
+                    <a href="{% url 'participants:dog_list' %}" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-heart-fill"></i> Mis Perros
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-card-checklist"></i> Mis Inscripciones
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-file-earmark-text"></i> Mis Documentos
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-trophy-fill"></i> Mis Resultados
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{% if action == 'edit' %}Editar Perro: {{ dog.name }}{% else %}Registrar Nuevo Perro{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Información Básica</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="id_name" class="form-label">Nombre</label>
+                                    <input type="text" name="name" id="id_name" class="form-control"
+                                        value="{{ form.initial.name }}" />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_microchip_number" class="form-label">Número de Microchip</label>
+                                    <input type="text" name="microchip_number" id="id_microchip_number" class="form-control"
+                                        value="{{ form.initial.microchip_number }}" />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_breed" class="form-label">Raza</label>
+                                    <input type="text" name="breed" id="id_breed" class="form-control"
+                                        value="{{ form.initial.breed }}" />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_date_of_birth" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" name="date_of_birth" id="id_date_of_birth" class="form-control"
+                                        value="{{ form.initial.date_of_birth|date:'Y-m-d' }}" />
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Información Adicional</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="id_veterinary_book_number" class="form-label">Número de Cartilla Veterinaria</label>
+                                    <input type="text" name="veterinary_book_number" id="id_veterinary_book_number" class="form-control"
+                                        value="{{ form.initial.veterinary_book_number }}" />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_gender" class="form-label">Género</label>
+                                    <select name="gender" id="id_gender" class="form-control">
+                                        <option value="M" {% if form.initial.gender == "M" %}selected{% endif %}>Macho</option>
+                                        <option value="F" {% if form.initial.gender == "F" %}selected{% endif %}>Hembra</option>
+                                    </select>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                {% if action == 'edit' %}Guardar Cambios{% else %}Registrar Perro{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'participants:dog_list' %}" class="btn btn-outline-secondary">Volver a Mis Perros</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

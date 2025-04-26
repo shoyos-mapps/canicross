@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Carreras - {{ event.name }} - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Carreras - {{ event.name }}</h2>
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'events:event_list' %}">Eventos</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'events:event_detail' event.slug %}">{{ event.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Carreras</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        {% for race in races %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ race.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Modalidad:</strong> {{ race.modality.name }}</p>
+                    <p><strong>Distancia:</strong> {{ race.distance }} km</p>
+                    <p><strong>Fecha:</strong> {{ race.race_date|date:"d/m/Y" }}</p>
+                    <p><strong>Hora:</strong> {{ race.race_time|time:"H:i" }}</p>
+                    <p><strong>Tipo de salida:</strong> {{ race.get_start_type_display }}</p>
+                    <p><strong>Máximo participantes:</strong> {{ race.max_participants }}</p>
+                    
+                    {% if race.description %}
+                    <h6>Descripción</h6>
+                    <p>{{ race.description|linebreaks }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'events:race_detail' event.slug race.id %}" class="btn btn-primary">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No hay carreras disponibles para este evento.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-secondary">Volver al evento</a>
+    </div>
+</div>
+{% endblock %}

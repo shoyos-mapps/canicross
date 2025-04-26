@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ race.name }} - {{ event.name }} - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ race.name }}</h2>
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'events:event_list' %}">Eventos</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'events:event_detail' event.slug %}">{{ event.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'events:race_list' event.slug %}">Carreras</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ race.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Información de la carrera</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Detalles generales</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Modalidad:</strong> {{ race.modality.name }}</li>
+                                <li class="list-group-item"><strong>Distancia:</strong> {{ race.distance }} km</li>
+                                <li class="list-group-item"><strong>Fecha:</strong> {{ race.race_date|date:"d/m/Y" }}</li>
+                                <li class="list-group-item"><strong>Hora programada:</strong> {{ race.race_time|time:"H:i" }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Información técnica</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Tipo de salida:</strong> {{ race.get_start_type_display }}</li>
+                                {% if race.start_type != 'mass' %}
+                                <li class="list-group-item"><strong>Participantes por intervalo:</strong> {{ race.participants_per_interval }}</li>
+                                <li class="list-group-item"><strong>Segundos entre intervalos:</strong> {{ race.interval_seconds }}</li>
+                                {% endif %}
+                                <li class="list-group-item"><strong>Máximo participantes:</strong> {{ race.max_participants }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    {% if race.description %}
+                    <h5>Descripción</h5>
+                    <p>{{ race.description|linebreaks }}</p>
+                    {% endif %}
+                    
+                    {% if race.actual_start_time %}
+                    <div class="alert alert-info">
+                        <h5>Hora de inicio real</h5>
+                        <p>{{ race.actual_start_time|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    {% if event.status == 'registration_open' %}
+                    <a href="#" class="btn btn-success">Inscribirse en esta carrera</a>
+                    {% endif %}
+                    <a href="{% url 'events:race_list' event.slug %}" class="btn btn-outline-secondary">Volver a lista de carreras</a>
+                </div>
+            </div>
+            
+            <!-- Categorías de la carrera -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">Categorías</h3>
+                </div>
+                <div class="card-body">
+                    {% if race.race_categories.all %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th>Género</th>
+                                    <th>Edad</th>
+                                    <th>Precio</th>
+                                    <th>Plazas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for race_category in race.race_categories.all %}
+                                <tr>
+                                    <td>{{ race_category.category.name }}</td>
+                                    <td>{{ race_category.category.get_gender_display }}</td>
+                                    <td>{{ race_category.category.min_age }}-{{ race_category.category.max_age }}</td>
+                                    <td>{{ race_category.price }} €</td>
+                                    <td>
+                                        {% if race_category.quota == 0 %}
+                                        Ilimitadas
+                                        {% else %}
+                                        {{ race_category.quota }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aún no hay categorías definidas para esta carrera.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Información del evento -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Evento: {{ event.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Fecha:</strong> {{ event.start_date|date:"d/m/Y" }} - {{ event.end_date|date:"d/m/Y" }}</p>
+                    <p><strong>Estado:</strong> {{ event.get_status_display }}</p>
+                    <p><strong>Ubicación:</strong> {{ event.location }}</p>
+                    <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-info btn-sm">Ver detalles del evento</a>
+                </div>
+            </div>
+            
+            <!-- Resultados (si la carrera ya se celebró) -->
+            {% if event.status == 'completed' %}
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Resultados</h5>
+                </div>
+                <div class="card-body">
+                    <a href="#" class="btn btn-success">Ver resultados completos</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

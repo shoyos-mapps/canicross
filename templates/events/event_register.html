@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscripción - {{ event.name }} - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Inscripción - {{ event.name }}</h1>
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'events:event_list' %}">Eventos</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'events:event_detail' event.slug %}">{{ event.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Inscripción</li>
+        </ol>
+    </nav>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h2 class="mb-0 text-primary">Formulario de Inscripción</h2>
+                </div>
+                <div class="card-body">
+                    {% if needs_login %}
+                        <div class="alert alert-light border">
+                            <p><strong>¡Necesita iniciar sesión para inscribirse!</strong></p>
+                            <p>Por favor, inicie sesión o inscríbase para continuar con el proceso de inscripción.</p>
+                            <div class="mt-3">
+                                <a href="/accounts/login/?next={{ request.path }}" class="btn btn-primary me-2">Iniciar Sesión</a>
+                                <a href="/accounts/register/" class="btn btn-outline-primary">Inscribirse</a>
+                            </div>
+                        </div>
+                    {% elif not dogs %}
+                        <div class="alert alert-light border">
+                            <p><strong>¡Necesita completar su perfil antes de inscribirse!</strong></p>
+                            <p>Por favor, complete su perfil de participante y registre al menos un perro antes de inscribirse en este evento.</p>
+                            <div class="mt-3">
+                                <a href="/participants/profile/" class="btn btn-primary me-2">Completar Perfil</a>
+                                <a href="/participants/dogs/add/" class="btn btn-outline-primary">Registrar Perro</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'events:event_register' event.slug %}">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="race" class="form-label">Carrera:</label>
+                                <select class="form-select" id="race" name="race" required>
+                                    <option value="">Seleccione una carrera</option>
+                                    {% for race in races %}
+                                    <option value="{{ race.id }}">{{ race.name }} - {{ race.distance }}km ({{ race.modality.name }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="race_category" class="form-label">Categoría:</label>
+                                <select class="form-select" id="race_category" name="race_category" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    {% for rc in race_categories %}
+                                    <option value="{{ rc.id }}" data-race="{{ rc.race.id }}">{{ rc.category.name }} - {{ rc.price }}€</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="dog" class="form-label">Perro:</label>
+                                <select class="form-select" id="dog" name="dog" required>
+                                    <option value="">Seleccione un perro</option>
+                                    {% for dog in dogs %}
+                                    <option value="{{ dog.id }}">{{ dog.name }} ({{ dog.breed }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="waiver_accepted" name="waiver_accepted" required>
+                                <label class="form-check-label" for="waiver_accepted">
+                                    Acepto los términos y condiciones del evento y confirmo que tanto yo como mi perro estamos en condiciones físicas adecuadas para participar.
+                                </label>
+                            </div>
+                            
+                            <div class="alert alert-light border">
+                                <h5 class="text-primary">Información Importante:</h5>
+                                <ul>
+                                    <li>Deberá presentar la documentación veterinaria requerida antes del evento.</li>
+                                    <li>El pago debe realizarse dentro de las 24 horas posteriores a la inscripción para confirmar su plaza.</li>
+                                    <li>Las inscripciones son nominativas y no transferibles.</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Completar Inscripción</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Información del Evento</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> {{ event.name }}</p>
+                    <p><strong>Fecha:</strong> {{ event.start_date|date:"d/m/Y" }} - {{ event.end_date|date:"d/m/Y" }}</p>
+                    <p><strong>Ubicación:</strong> {{ event.location }}</p>
+                    <p><strong>Estado:</strong> {{ event.get_status_display }}</p>
+                    <p><strong>Inscripciones:</strong> {{ event.registration_start|date:"d/m/Y H:i" }} - {{ event.registration_end|date:"d/m/Y H:i" }}</p>
+                    
+                    <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-secondary">Ver Detalles del Evento</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Documentos Requeridos</h5>
+                </div>
+                <div class="card-body">
+                    {% if event.required_documents %}
+                    <ul class="list-group">
+                        {% for doc in event.required_documents %}
+                        <li class="list-group-item">{{ doc }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No hay documentos específicos requeridos.</p>
+                    {% endif %}
+                    
+                    <h6 class="mt-3">Vacunas Obligatorias:</h6>
+                    {% if event.required_vaccines %}
+                    <ul class="list-group">
+                        {% for vaccine in event.required_vaccines %}
+                        <li class="list-group-item">{{ vaccine }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No hay vacunas específicas requeridas.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtrar categorías según la carrera seleccionada
+    const raceSelect = document.getElementById('race');
+    const categorySelect = document.getElementById('race_category');
+    
+    if (raceSelect && categorySelect) {
+        raceSelect.addEventListener('change', function() {
+            const raceId = this.value;
+            
+            // Ocultar todas las opciones de categoría primero
+            for (let option of categorySelect.options) {
+                if (option.value === '') continue; // Mantener la opción por defecto
+                
+                if (option.dataset.race === raceId) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+            
+            // Resetear la selección
+            categorySelect.value = '';
+        });
+    }
+});
+</script>
+{% endblock %}

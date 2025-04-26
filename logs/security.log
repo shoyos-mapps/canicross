@@ -1,0 +1,65 @@
+2025-04-21 20:35:51,621 WARNING demo_logs 1240924 139657025926976 Base de datos cercana a su capacidad máxima (85%)
+2025-04-21 20:35:51,779 WARNING demo_logs 1240924 139657025926976 Documento sospechoso detectado: ID-2080.jpg
+2025-04-21 20:35:52,038 WARNING demo_logs 1240924 139657025926976 Certificado SSL expirará en 15 días
+2025-04-21 20:35:52,171 WARNING demo_logs 1240924 139657025926976 Solicitud lenta detectada (> 2s) en endpoint de resultados
+2025-04-21 20:35:52,221 WARNING demo_logs 1240924 139657025926976 Memoria del servidor por encima del 90%
+2025-04-21 20:35:52,508 WARNING demo_logs 1240924 139657025926976 Certificado SSL expirará en 15 días
+2025-04-21 20:35:53,043 WARNING demo_logs 1240924 139657025926976 Certificado SSL expirará en 15 días
+2025-04-23 02:20:44,002 ERROR exception 2176586 140505090356800 Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/http/request.py", line 186, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+2025-04-23 02:20:44,815 ERROR exception 2176586 140505090356800 Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/http/request.py", line 186, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+2025-04-23 02:24:53,033 ERROR exception 2261474 139708873045568 Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/http/request.py", line 186, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+2025-04-23 02:24:53,890 ERROR exception 2261474 139708873045568 Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/http/request.py", line 186, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'hikers.mappsco.com'. You may need to add 'hikers.mappsco.com' to ALLOWED_HOSTS.
+2025-04-23 02:42:22,590 WARNING log 2266726 140277155100224 Forbidden (Origin checking failed - https://hikers.mappsco.com does not match any trusted origins.): /accounts/register/
+2025-04-23 02:51:50,696 WARNING log 2266726 140277155100224 Forbidden (Origin checking failed - https://hikers.mappsco.com does not match any trusted origins.): /accounts/register/

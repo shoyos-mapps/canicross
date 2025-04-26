@@ -1,0 +1,14 @@
+2025-04-21 20:35:53,668 ERROR demo_logs 1240924 139657025926976 Error de autenticación: token inválido
+2025-04-21 20:35:54,001 ERROR demo_logs 1240924 139657025926976 División por cero en cálculo de resultados
+2025-04-21 20:35:54,140 ERROR demo_logs 1240924 139657025926976 División por cero en cálculo de resultados
+2025-04-21 20:35:57,782 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.426s): SELECT * FROM events_event WHERE id = 27
+2025-04-21 20:35:57,994 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.222s): SELECT r.*, e.name FROM participants_participant r JOIN events_event e ON r.event_id = e.id
+2025-04-21 20:35:58,078 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.053s): SELECT r.*, e.name FROM participants_dog r JOIN events_event e ON r.event_id = e.id
+2025-04-21 20:35:58,304 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.039s): SELECT * FROM participants_dog WHERE id = 91
+2025-04-21 20:35:58,492 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.038s): UPDATE events_race SET updated_at = NOW() WHERE id = 15
+2025-04-21 20:35:58,574 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.187s): INSERT INTO participants_dog (name, created_at) VALUES ('Test', NOW())
+2025-04-21 20:35:58,965 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.497s): DELETE FROM participants_participant WHERE id = 56
+2025-04-21 20:35:59,039 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.404s): SELECT r.*, e.name FROM participants_dog r JOIN events_event e ON r.event_id = e.id
+2025-04-21 20:35:59,460 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.189s): DELETE FROM events_race WHERE id = 82
+2025-04-21 20:35:59,762 WARNING demo_logs 1240924 139657025926976 Slow DB Query (1.468s): DELETE FROM registrations_registration WHERE id = 14
+2025-04-21 20:35:59,837 WARNING logger 1240924 139657025926976 DB Operation Slow - generate_db_logs() - Duration: 2.208s

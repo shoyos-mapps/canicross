@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmación de Inscripción - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">¡Inscripción completada con éxito!</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <p><strong>¡Tu inscripción ha sido registrada!</strong> Te hemos enviado un correo electrónico con todos los detalles.</p>
+                    </div>
+                    
+                    <h4 class="mt-4">Detalles de la Inscripción:</h4>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <strong>Evento: {{ event.name }}</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Participante:</strong> {{ participant.first_name }} {{ participant.last_name }}</p>
+                                    <p><strong>Perro:</strong> {{ dog.name }} ({{ dog.breed }})</p>
+                                    <p><strong>Carrera:</strong> {{ race.name }}</p>
+                                    <p><strong>Categoría:</strong> {{ category.name }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Precio:</strong> {{ registration.race_category.price }}€</p>
+                                    <p><strong>Estado de inscripción:</strong> <span class="badge {% if registration.registration_status == 'confirmed' %}bg-success{% else %}bg-warning{% endif %}">{{ registration.get_registration_status_display }}</span></p>
+                                    <p><strong>Estado de pago:</strong> <span class="badge {% if registration.payment_status == 'paid' %}bg-success{% else %}bg-warning{% endif %}">{{ registration.get_payment_status_display }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if registration.payment_status == 'pending' %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Opciones de Pago</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Para completar tu inscripción, por favor realiza el pago correspondiente usando alguno de los siguientes métodos:</p>
+                            
+                            <div class="list-group mb-3">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Tarjeta de Crédito/Débito</h5>
+                                        <small>Inmediato</small>
+                                    </div>
+                                    <p class="mb-1">Pago seguro con tarjeta a través de nuestra plataforma.</p>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">Transferencia Bancaria</h5>
+                                        <small>1-3 días hábiles</small>
+                                    </div>
+                                    <p class="mb-1">Realiza una transferencia a nuestra cuenta bancaria utilizando la referencia: <strong>REF-{{ registration.id }}</strong></p>
+                                    <p class="mb-0"><strong>IBAN:</strong> ES12 3456 7890 1234 5678 9012</p>
+                                </a>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <p><strong>Importante:</strong> El pago debe realizarse dentro de las próximas 48 horas para mantener tu plaza reservada.</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <strong>Próximos Pasos</strong>
+                        </div>
+                        <div class="card-body">
+                            <ol class="mb-0">
+                                {% if registration.payment_status == 'pending' %}
+                                <li class="mb-2">Realiza el pago para confirmar tu inscripción</li>
+                                {% endif %}
+                                <li class="mb-2">Asegúrate de que la información veterinaria de tu perro esté actualizada</li>
+                                <li class="mb-2">Prepara los documentos necesarios para el evento</li>
+                                <li class="mb-2">Recoge tu dorsal el día del evento</li>
+                                <li>¡Prepárate para disfrutar de una gran carrera!</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-secondary">Volver al Evento</a>
+                        <a href="#" class="btn btn-primary">Ver Mis Inscripciones</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

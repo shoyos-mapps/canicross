@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block title %}Mis Perros - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Mi Cuenta</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'participants:profile' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-fill"></i> Mi Perfil
+                    </a>
+                    <a href="{% url 'participants:dog_list' %}" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-heart-fill"></i> Mis Perros
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-card-checklist"></i> Mis Inscripciones
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-file-earmark-text"></i> Mis Documentos
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-trophy-fill"></i> Mis Resultados
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            {% if messages %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Mis Perros</h2>
+                    <a href="{% url 'participants:dog_add' %}" class="btn btn-light">
+                        <i class="bi bi-plus-circle"></i> Nuevo Perro
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if dogs %}
+                    <div class="row">
+                        {% for dog in dogs %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="bg-light text-center py-3">
+                                    <i class="bi bi-heart-fill fs-2 text-danger"></i>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ dog.name }}</h5>
+                                    <p class="card-text">
+                                        <strong>Raza:</strong> {{ dog.breed }}<br>
+                                        <strong>Edad:</strong> {% if dog.get_age %}{{ dog.get_age }} años{% else %}Desconocida{% endif %}<br>
+                                        <strong>Chip:</strong> {{ dog.microchip_number|truncatechars:15 }}
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{% url 'participants:dog_detail' dog.id %}" class="btn btn-sm btn-primary">Ver Detalles</a>
+                                    <a href="{% url 'participants:dog_edit' dog.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-heart fs-1 text-muted"></i>
+                        <h5 class="mt-3">No has registrado ningún perro aún</h5>
+                        <p class="text-muted">Para participar en eventos de Canicross, necesitas registrar al menos un perro.</p>
+                        <a href="{% url 'participants:dog_add' %}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle"></i> Registrar Perro
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if dogs %}
+                <div class="card-footer">
+                    <a href="{% url 'participants:profile' %}" class="btn btn-outline-secondary">Volver a Mi Perfil</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

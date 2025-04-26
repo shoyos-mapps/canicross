@@ -1,0 +1,514 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+<style>
+  .log-container {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-height: 600px;
+    overflow: auto;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 13px;
+  }
+  .log-line {
+    margin: 0;
+    padding: 2px 0;
+    border-bottom: 1px dotted #eee;
+  }
+  .log-line:hover {
+    background-color: #f0f0f0;
+  }
+  .error {
+    color: #e53935;
+    font-weight: bold;
+  }
+  .warning {
+    color: #ff9800;
+  }
+  .info {
+    color: #2196f3;
+  }
+  .debug {
+    color: #4caf50;
+  }
+  .log-controls {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .log-controls select,
+  .log-controls input,
+  .log-controls button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  .tab-nav {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+  }
+  .tab-nav button {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    padding: 10px 15px;
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  .tab-nav button.active {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    font-weight: bold;
+  }
+  .chart-container {
+    height: 300px;
+    margin-bottom: 20px;
+  }
+  .metric-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .metric-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+  }
+  .metric-value {
+    font-size: 24px;
+    color: #2196f3;
+  }
+  table.metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.metrics-table th,
+  table.metrics-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  table.metrics-table th {
+    background-color: #f5f5f5;
+  }
+  table.metrics-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Visor de Logs de Canicross</h1>
+  
+  <div class="tab-nav">
+    <button class="tab-link active" onclick="openTab(event, 'tab-viewer')">Visor de Logs</button>
+    <button class="tab-link" onclick="openTab(event, 'tab-summary')">Resumen de Errores</button>
+    <button class="tab-link" onclick="openTab(event, 'tab-metrics')">Métricas de Rendimiento</button>
+  </div>
+  
+  <!-- Tab de Visor de Logs -->
+  <div id="tab-viewer" class="tab-content active">
+    <div class="log-controls">
+      <select id="log-file">
+        <option value="">Seleccionar archivo de log</option>
+        {% for file in log_files %}
+        <option value="{{ file }}">{{ file }}</option>
+        {% endfor %}
+      </select>
+      
+      <select id="log-level">
+        <option value="">Todos los niveles</option>
+        <option value="ERROR">ERROR</option>
+        <option value="WARNING">WARNING</option>
+        <option value="INFO">INFO</option>
+        <option value="DEBUG">DEBUG</option>
+      </select>
+      
+      <input type="text" id="log-filter" placeholder="Texto para filtrar...">
+      
+      <select id="log-lines">
+        <option value="100">100 líneas</option>
+        <option value="500">500 líneas</option>
+        <option value="1000" selected>1000 líneas</option>
+        <option value="5000">5000 líneas</option>
+      </select>
+      
+      <button onclick="loadLogContent()">Cargar</button>
+      <button onclick="exportLog('csv')">Exportar CSV</button>
+      <button onclick="exportLog('json')">Exportar JSON</button>
+    </div>
+    
+    <div id="log-container" class="log-container">
+      <p>Seleccione un archivo de log para visualizar su contenido.</p>
+    </div>
+  </div>
+  
+  <!-- Tab de Resumen de Errores -->
+  <div id="tab-summary" class="tab-content">
+    <div class="log-controls">
+      <select id="summary-days">
+        <option value="1">Último día</option>
+        <option value="3">Últimos 3 días</option>
+        <option value="7" selected>Última semana</option>
+        <option value="30">Último mes</option>
+      </select>
+      
+      <button onclick="loadErrorSummary()">Cargar Resumen</button>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-title">Total de Errores</div>
+      <div class="metric-value" id="total-errors">-</div>
+    </div>
+    
+    <div class="chart-container">
+      <canvas id="errors-chart"></canvas>
+    </div>
+    
+    <h3>Top Errores</h3>
+    <table class="metrics-table" id="top-errors-table">
+      <thead>
+        <tr>
+          <th>Error</th>
+          <th>Ocurrencias</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se llenará con JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Tab de Métricas de Rendimiento -->
+  <div id="tab-metrics" class="tab-content">
+    <div class="log-controls">
+      <select id="metrics-days">
+        <option value="1">Último día</option>
+        <option value="3">Últimos 3 días</option>
+        <option value="7" selected>Última semana</option>
+        <option value="30">Último mes</option>
+      </select>
+      
+      <button onclick="loadPerformanceMetrics()">Cargar Métricas</button>
+    </div>
+    
+    <div class="metric-card">
+      <div class="metric-title">Total de Solicitudes</div>
+      <div class="metric-value" id="total-requests">-</div>
+    </div>
+    
+    <div class="chart-container">
+      <canvas id="requests-chart"></canvas>
+    </div>
+    
+    <h3>Endpoints más Lentos</h3>
+    <table class="metrics-table" id="endpoints-table">
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Solicitudes</th>
+          <th>Tiempo Promedio (s)</th>
+          <th>Tiempo Máximo (s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se llenará con JavaScript -->
+      </tbody>
+    </table>
+    
+    <h3>Solicitudes más Lentas</h3>
+    <table class="metrics-table" id="slow-requests-table">
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Duración (s)</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se llenará con JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+  // Función para cambiar entre tabs
+  function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    
+    // Ocultar todos los contenidos de tabs
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].classList.remove("active");
+    }
+    
+    // Desactivar todos los botones de tabs
+    tablinks = document.getElementsByClassName("tab-link");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].classList.remove("active");
+    }
+    
+    // Mostrar el tab actual y activar el botón
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+    
+    // Cargar datos si es necesario
+    if (tabName === 'tab-summary' && document.getElementById('total-errors').innerText === '-') {
+      loadErrorSummary();
+    } else if (tabName === 'tab-metrics' && document.getElementById('total-requests').innerText === '-') {
+      loadPerformanceMetrics();
+    }
+  }
+  
+  // Cargar contenido del log
+  function loadLogContent() {
+    const file = document.getElementById('log-file').value;
+    if (!file) {
+      alert('Por favor, seleccione un archivo de log');
+      return;
+    }
+    
+    const level = document.getElementById('log-level').value;
+    const filter = document.getElementById('log-filter').value;
+    const lines = document.getElementById('log-lines').value;
+    
+    const url = `{% url 'admin:log-content' %}?file=${encodeURIComponent(file)}&level=${encodeURIComponent(level)}&filter=${encodeURIComponent(filter)}&lines=${lines}`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('log-container');
+        
+        if (data.error) {
+          container.innerHTML = `<p class="error">${data.error}</p>`;
+          return;
+        }
+        
+        if (data.lines.length === 0) {
+          container.innerHTML = '<p>No se encontraron resultados.</p>';
+          return;
+        }
+        
+        let html = '';
+        data.lines.forEach((line, index) => {
+          let cssClass = '';
+          if (line.includes(' ERROR ')) {
+            cssClass = 'error';
+          } else if (line.includes(' WARNING ')) {
+            cssClass = 'warning';
+          } else if (line.includes(' INFO ')) {
+            cssClass = 'info';
+          } else if (line.includes(' DEBUG ')) {
+            cssClass = 'debug';
+          }
+          
+          html += `<div class="log-line ${cssClass}">${line}</div>`;
+        });
+        
+        container.innerHTML = html;
+        container.scrollTop = container.scrollHeight;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('log-container').innerHTML = `<p class="error">Error al cargar el log: ${error.message}</p>`;
+      });
+  }
+  
+  // Exportar log a CSV o JSON
+  function exportLog(format) {
+    const file = document.getElementById('log-file').value;
+    if (!file) {
+      alert('Por favor, seleccione un archivo de log');
+      return;
+    }
+    
+    const level = document.getElementById('log-level').value;
+    const filter = document.getElementById('log-filter').value;
+    
+    const url = `{% url 'admin:log-export' %}?file=${encodeURIComponent(file)}&format=${format}&level=${encodeURIComponent(level)}&filter=${encodeURIComponent(filter)}`;
+    
+    window.location.href = url;
+  }
+  
+  // Cargar resumen de errores
+  function loadErrorSummary() {
+    const days = document.getElementById('summary-days').value;
+    const url = `{% url 'admin:log-summary' %}?days=${days}`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        // Actualizar total de errores
+        document.getElementById('total-errors').innerText = data.total_errors;
+        
+        // Crear gráfico de errores por día
+        createErrorsChart(data.errors_by_day);
+        
+        // Actualizar tabla de top errores
+        const tbody = document.getElementById('top-errors-table').getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '';
+        
+        Object.entries(data.top_errors).forEach(([error, count]) => {
+          const row = tbody.insertRow();
+          const cell1 = row.insertCell(0);
+          const cell2 = row.insertCell(1);
+          
+          cell1.textContent = error;
+          cell2.textContent = count;
+        });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(`Error al cargar el resumen: ${error.message}`);
+      });
+  }
+  
+  // Crear gráfico de errores por día
+  function createErrorsChart(errorsData) {
+    const ctx = document.getElementById('errors-chart').getContext('2d');
+    
+    if (window.errorsChart) {
+      window.errorsChart.destroy();
+    }
+    
+    const labels = Object.keys(errorsData);
+    const values = Object.values(errorsData);
+    
+    window.errorsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Errores por día',
+          data: values,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
+  
+  // Cargar métricas de rendimiento
+  function loadPerformanceMetrics() {
+    const days = document.getElementById('metrics-days').value;
+    const url = `{% url 'admin:log-metrics' %}?days=${days}`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        // Actualizar total de solicitudes
+        document.getElementById('total-requests').innerText = data.total_requests;
+        
+        // Crear gráfico de solicitudes por día
+        createRequestsChart(data.requests_by_day);
+        
+        // Actualizar tabla de endpoints
+        const endpointsTable = document.getElementById('endpoints-table').getElementsByTagName('tbody')[0];
+        endpointsTable.innerHTML = '';
+        
+        Object.entries(data.endpoint_stats).forEach(([endpoint, stats]) => {
+          const row = endpointsTable.insertRow();
+          
+          row.insertCell(0).textContent = endpoint;
+          row.insertCell(1).textContent = stats.count;
+          row.insertCell(2).textContent = stats.avg_duration.toFixed(3);
+          row.insertCell(3).textContent = stats.max_duration.toFixed(3);
+        });
+        
+        // Actualizar tabla de solicitudes lentas
+        const slowTable = document.getElementById('slow-requests-table').getElementsByTagName('tbody')[0];
+        slowTable.innerHTML = '';
+        
+        data.slow_requests.forEach(request => {
+          const row = slowTable.insertRow();
+          
+          row.insertCell(0).textContent = request.endpoint;
+          row.insertCell(1).textContent = request.duration.toFixed(3);
+          row.insertCell(2).textContent = request.date;
+        });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(`Error al cargar las métricas: ${error.message}`);
+      });
+  }
+  
+  // Crear gráfico de solicitudes por día
+  function createRequestsChart(requestsData) {
+    const ctx = document.getElementById('requests-chart').getContext('2d');
+    
+    if (window.requestsChart) {
+      window.requestsChart.destroy();
+    }
+    
+    const labels = Object.keys(requestsData);
+    const values = Object.values(requestsData);
+    
+    window.requestsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Solicitudes por día',
+          data: values,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          tension: 0.1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
+</script>
+{% endblock %}
