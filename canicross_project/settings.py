@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # Custom apps
+    'utils.apps.UtilsConfig',  # Añadido primero para asegurar la carga de señales
     'accounts',
     'events',
     'participants.apps.ParticipantsConfig',
