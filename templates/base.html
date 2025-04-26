@@ -142,6 +142,20 @@
                             <i class="bi bi-calendar-event me-1"></i>Eventos
                         </a>
                     </li>
+                    {% if user.is_authenticated and user.is_veterinary %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'veterinary:dashboard' %}">
+                            <i class="bi bi-heart-pulse me-1"></i>Área Veterinaria
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if user.is_authenticated and user.is_judge %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{% url 'results:dashboard' %}">
+                            <i class="bi bi-stopwatch me-1"></i>Área de Jueces
+                        </a>
+                    </li>
+                    {% endif %}
                     <!-- Agregar más enlaces de navegación aquí -->
                 </ul>
                 <ul class="navbar-nav">

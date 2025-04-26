@@ -1566,3 +1566,79 @@
 {"asctime":"2025-04-26 00:17:09,729", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.008s - GET /admin/jsi18n/"}
 {"asctime":"2025-04-26 00:17:15,085", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
 {"asctime":"2025-04-26 00:17:15,085", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.027s - GET /admin/"}
+{"asctime":"2025-04-26 02:20:14,763", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/", "user": "anonymous", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:20:14,764", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.079s - GET /"}
+{"asctime":"2025-04-26 02:20:17,846", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/", "user": "anonymous", "ip": "190.158.204.57", "status_code": 302}"}
+{"asctime":"2025-04-26 02:20:17,846", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.031s - GET /admin/"}
+{"asctime":"2025-04-26 02:20:18,103", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/login/", "user": "anonymous", "ip": "190.158.204.57", "query_params": {"next": ["/admin/"]}, "status_code": 200}"}
+{"asctime":"2025-04-26 02:20:18,103", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.034s - GET /admin/login/"}
+{"asctime":"2025-04-26 02:20:23,803", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "POST", "path": "/admin/login/", "user": " (admin)", "ip": "190.158.204.57", "query_params": {"next": ["/admin/"]}, "form_data": {"csrfmiddlewaretoken": ["xcWO9E2LYgpIuvqbUVKD6CtHyatGziprBdV3sL2GbilbdTWfJYM5DPemqwbntpRx"], "username": ["admin"], "password": ["s4ntiagos"], "next": ["/admin/"]}, "status_code": 302}"}
+{"asctime":"2025-04-26 02:20:23,803", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.825s - POST /admin/login/"}
+{"asctime":"2025-04-26 02:20:24,008", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:20:24,008", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.020s - GET /admin/"}
+{"asctime":"2025-04-26 02:48:35,478", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/", "user": "anonymous", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:48:35,478", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.093s - GET /"}
+{"asctime":"2025-04-26 02:48:42,313", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:48:42,314", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.085s - GET /admin/"}
+{"asctime":"2025-04-26 02:48:59,497", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/events/penaltytype/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:48:59,497", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.053s - GET /admin/events/penaltytype/"}
+{"asctime":"2025-04-26 02:48:59,841", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:48:59,841", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.007s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 02:49:06,680", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/events/modality/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:06,681", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.049s - GET /admin/events/modality/"}
+{"asctime":"2025-04-26 02:49:06,882", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:06,882", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.005s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 02:49:16,117", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/events/event/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:16,118", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.039s - GET /admin/events/event/"}
+{"asctime":"2025-04-26 02:49:16,308", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:16,309", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.004s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 02:49:24,809", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/registrations/participantannotation/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:24,809", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.045s - GET /admin/registrations/participantannotation/"}
+{"asctime":"2025-04-26 02:49:25,008", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:25,009", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.004s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 02:49:27,666", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/registrations/registration/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:27,666", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.063s - GET /admin/registrations/registration/"}
+{"asctime":"2025-04-26 02:49:27,852", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 02:49:27,853", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.004s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 14:21:16,565", "levelname":"WARNING", "module":"logger", "message":"Error API 404: {"method": "GET", "path": "/favicon.ico", "user": "anonymous", "ip": "190.158.204.57", "status_code": 404}"}
+{"asctime":"2025-04-26 14:21:16,566", "levelname":"WARNING", "module":"logger", "message":"Error API 404: {"method": "GET", "path": "/apple-touch-icon.png", "user": "anonymous", "ip": "190.158.204.57", "status_code": 404}"}
+{"asctime":"2025-04-26 14:21:16,572", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.032s - GET /favicon.ico"}
+{"asctime":"2025-04-26 14:21:16,575", "levelname":"WARNING", "module":"logger", "message":"Error API 404: {"method": "GET", "path": "/apple-touch-icon-precomposed.png", "user": "anonymous", "ip": "190.158.204.57", "status_code": 404}"}
+{"asctime":"2025-04-26 14:21:16,576", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.045s - GET /apple-touch-icon.png"}
+{"asctime":"2025-04-26 14:21:16,578", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.019s - GET /apple-touch-icon-precomposed.png"}
+{"asctime":"2025-04-26 14:21:21,007", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/registrations/registration/", "user": "anonymous", "ip": "190.158.204.57", "status_code": 302}"}
+{"asctime":"2025-04-26 14:21:21,007", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.002s - GET /admin/registrations/registration/"}
+{"asctime":"2025-04-26 14:21:21,189", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/login/", "user": "anonymous", "ip": "190.158.204.57", "query_params": {"next": ["/admin/registrations/registration/"]}, "status_code": 200}"}
+{"asctime":"2025-04-26 14:21:21,189", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.022s - GET /admin/login/"}
+{"asctime":"2025-04-26 14:21:22,578", "levelname":"WARNING", "module":"logger", "message":"Error API 404: {"method": "GET", "path": "/favicon.ico", "user": "anonymous", "ip": "190.158.204.57", "status_code": 404}"}
+{"asctime":"2025-04-26 14:21:22,578", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.014s - GET /favicon.ico"}
+{"asctime":"2025-04-26 14:21:28,543", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "POST", "path": "/admin/login/", "user": "anonymous", "ip": "190.158.204.57", "query_params": {"next": ["/admin/registrations/registration/"]}, "form_data": {"csrfmiddlewaretoken": ["m2ZsMZUWrr7kC0Z3lfXEb22MnflCjx1eWVmzDQbdXT9JuYmoPs28ajpee4AM5hxW"], "username": ["admin"], "password": ["s4ntiagos*"], "next": ["/admin/registrations/registration/"]}, "status_code": 200}"}
+{"asctime":"2025-04-26 14:21:28,543", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.810s - POST /admin/login/"}
+{"asctime":"2025-04-26 14:22:00,424", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "POST", "path": "/admin/login/", "user": " (admin)", "ip": "190.158.204.57", "query_params": {"next": ["/admin/registrations/registration/"]}, "form_data": {"csrfmiddlewaretoken": ["vlqeodG2qr1g6fdh3yMyTZk0H9avmayc5eNlf4XjWT3FYdACxLR2SgHsyYpF8U4U"], "username": ["admin"], "password": ["s4ntiagos"], "next": ["/admin/registrations/registration/"]}, "status_code": 302}"}
+{"asctime":"2025-04-26 14:22:00,424", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.829s - POST /admin/login/"}
+{"asctime":"2025-04-26 14:22:00,692", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/registrations/registration/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:22:00,692", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.062s - GET /admin/registrations/registration/"}
+{"asctime":"2025-04-26 14:22:00,916", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:22:00,917", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.008s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 14:22:27,745", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/auth/group/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:22:27,745", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.029s - GET /admin/auth/group/"}
+{"asctime":"2025-04-26 14:22:28,174", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:22:28,175", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.079s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 14:22:30,913", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/auth/group/add/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:22:30,913", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.190s - GET /admin/auth/group/add/"}
+{"asctime":"2025-04-26 14:22:31,267", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:22:31,267", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.005s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 14:58:44,148", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/auth/group/add/", "user": "anonymous", "ip": "190.158.204.57", "status_code": 302}"}
+{"asctime":"2025-04-26 14:58:44,148", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.075s - GET /admin/auth/group/add/"}
+{"asctime":"2025-04-26 14:58:44,377", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/login/", "user": "anonymous", "ip": "190.158.204.57", "query_params": {"next": ["/admin/auth/group/add/"]}, "status_code": 200}"}
+{"asctime":"2025-04-26 14:58:44,377", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.050s - GET /admin/login/"}
+{"asctime":"2025-04-26 14:58:47,456", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "POST", "path": "/admin/login/", "user": " (admin)", "ip": "190.158.204.57", "query_params": {"next": ["/admin/auth/group/add/"]}, "form_data": {"csrfmiddlewaretoken": ["HhxwtCk9NRnrsDZCMskovBpXxeIerDTUdRG9vL2icvVZs6REJyiDyPUjwE1HZkSO"], "username": ["admin"], "password": ["s4ntiagos"], "next": ["/admin/auth/group/add/"]}, "status_code": 302}"}
+{"asctime":"2025-04-26 14:58:47,456", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.847s - POST /admin/login/"}
+{"asctime":"2025-04-26 14:58:47,777", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/auth/group/add/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:58:47,777", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.139s - GET /admin/auth/group/add/"}
+{"asctime":"2025-04-26 14:58:47,980", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:58:47,981", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.006s - GET /admin/jsi18n/"}
+{"asctime":"2025-04-26 14:58:51,847", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/auth/group/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:58:51,848", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.057s - GET /admin/auth/group/"}
+{"asctime":"2025-04-26 14:58:52,103", "levelname":"INFO", "module":"logger", "message":"API Request: {"method": "GET", "path": "/admin/jsi18n/", "user": " (admin)", "ip": "190.158.204.57", "status_code": 200}"}
+{"asctime":"2025-04-26 14:58:52,104", "levelname":"INFO", "module":"logger", "message":"API Request duración: 0.004s - GET /admin/jsi18n/"}

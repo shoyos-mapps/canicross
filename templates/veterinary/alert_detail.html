@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalle de Alerta Médica - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Alerta Médica #{{ alert.id }}</h1>
+            <p class="lead">
+                <span class="badge 
+                    {% if alert.priority == 'critical' %}bg-danger
+                    {% elif alert.priority == 'high' %}bg-warning text-dark
+                    {% elif alert.priority == 'medium' %}bg-info text-dark
+                    {% else %}bg-success
+                    {% endif %}">
+                    {{ alert.get_priority_display }}
+                </span>
+                
+                {{ alert.veterinary_check.dog.name }} - {{ alert.veterinary_check.registration.participant.first_name }} {{ alert.veterinary_check.registration.participant.last_name }}
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group">
+                <a href="{% url 'veterinary:alerts' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Volver a Alertas
+                </a>
+                <a href="{% url 'veterinary:medical_history' dog_id=alert.veterinary_check.dog.id %}" class="btn btn-outline-info">
+                    <i class="bi bi-clipboard-data"></i> Historial Médico
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Detalles de la alerta -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Detalles de la Alerta</h5>
+                    <span class="badge 
+                        {% if alert.status == 'active' %}bg-danger
+                        {% elif alert.status == 'monitoring' %}bg-warning text-dark
+                        {% elif alert.status == 'resolved' %}bg-success
+                        {% else %}bg-secondary
+                        {% endif %}">
+                        {{ alert.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-3 text-muted">Creada por {{ alert.created_by.get_full_name }} el {{ alert.created_at|date:"d/m/Y H:i" }}</h6>
+                    
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Descripción:</h6>
+                        <div class="alert alert-light">
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ alert.description }}</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="fw-bold">Fecha de creación:</span> {{ alert.created_at|date:"d/m/Y H:i" }}
+                            </div>
+                            <div class="mb-2">
+                                <span class="fw-bold">Última actualización:</span> {{ alert.updated_at|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="fw-bold">Requiere seguimiento:</span> 
+                                {% if alert.requires_followup %}
+                                <span class="badge bg-warning text-dark">Sí</span>
+                                {% else %}
+                                <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </div>
+                            <div class="mb-2">
+                                <span class="fw-bold">Notificación a staff:</span>
+                                {% if alert.notify_staff %}
+                                <span class="badge bg-info text-dark">Sí</span>
+                                {% else %}
+                                <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario para actualizar estado -->
+                    <form method="post" action="" class="mt-4">
+                        {% csrf_token %}
+                        <h6 class="fw-bold mb-3">Actualizar Estado:</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <select name="status" class="form-select">
+                                    {% for value, text in status_choices %}
+                                    <option value="{{ value }}" {% if alert.status == value %}selected{% endif %}>
+                                        {{ text }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary w-100">Actualizar Estado</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <label for="note" class="form-label">Añadir nota (opcional):</label>
+                            <textarea name="note" id="note" class="form-control" rows="3" placeholder="Añadir una nota sobre el cambio de estado o el seguimiento realizado..."></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información del perro -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Información del Perro</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Nombre:</span>
+                            <span>{{ alert.veterinary_check.dog.name }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Raza:</span>
+                            <span>{{ alert.veterinary_check.dog.breed }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Sexo:</span>
+                            <span>{{ alert.veterinary_check.dog.get_gender_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Microchip:</span>
+                            <span>{{ alert.veterinary_check.dog.microchip_number|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Propietario:</span>
+                            <span>{{ alert.veterinary_check.registration.participant.first_name }} {{ alert.veterinary_check.registration.participant.last_name }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Dorsal:</span>
+                            <span>{{ alert.veterinary_check.registration.bib_number|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Evento:</span>
+                            <span>{{ alert.veterinary_check.registration.race.event.name }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'veterinary:check' registration_id=alert.veterinary_check.registration.id %}" class="btn btn-outline-primary btn-sm w-100">
+                        Ver Revisión Veterinaria
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Revisión Veterinaria - Canicross{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">
+                {% if is_new %}
+                Nueva Revisión Veterinaria
+                {% else %}
+                Revisión Veterinaria #{{ vet_check.id }}
+                {% endif %}
+            </h1>
+            <p class="lead">{{ registration.dog.name }} - {{ registration.participant.first_name }} {{ registration.participant.last_name }}</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group">
+                <a href="{% url 'veterinary:registrations' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <a href="{% url 'veterinary:medical_history' dog_id=registration.dog.id %}" class="btn btn-outline-info">
+                    <i class="bi bi-clipboard-data"></i> Historial Médico
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Información básica del participante y perro -->
+        <div class="col-md-4 mb-4">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">Información del Perro</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Nombre:</span>
+                                    <span>{{ registration.dog.name }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Raza:</span>
+                                    <span>{{ registration.dog.breed }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Sexo:</span>
+                                    <span>{{ registration.dog.get_gender_display }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Fecha Nacimiento:</span>
+                                    <span>{{ registration.dog.date_of_birth|default:"-" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Microchip:</span>
+                                    <span>{{ registration.dog.microchip_number|default:"-" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Cartilla Veterinaria:</span>
+                                    <span>{{ registration.dog.veterinary_book_number|default:"-" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">Información del Participante</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Nombre:</span>
+                                    <span>{{ registration.participant.first_name }} {{ registration.participant.last_name }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Dorsal:</span>
+                                    <span>{{ registration.bib_number|default:"-" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Carrera:</span>
+                                    <span>{{ registration.race.name }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Evento:</span>
+                                    <span>{{ registration.race.event.name }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if vaccination_docs %}
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Documentos de Vacunación</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for doc in vaccination_docs %}
+                                <a href="{% url 'veterinary:document_review' document_id=doc.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ doc.get_document_type_display }}</h6>
+                                        <small>{{ doc.uploaded_at|date:"d/m/Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ doc.description|truncatechars:50|default:"Sin descripción" }}</p>
+                                    <small class="text-muted">
+                                        {% if doc.ocr_status == 'completed' %}
+                                        <span class="badge bg-success">OCR completado</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">OCR pendiente</span>
+                                        {% endif %}
+                                    </small>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'veterinary:vaccination_record' registration_id=registration.id %}" class="btn btn-outline-primary btn-sm">
+                                Gestionar vacunas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Formulario de revisión veterinaria -->
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Formulario de Revisión Veterinaria</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        
+                        <!-- Signos vitales -->
+                        <h4 class="mb-3 mt-2">Signos Vitales</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="temperature" class="form-label">Temperatura (°C)</label>
+                                <input type="number" class="form-control" id="temperature" name="temperature" 
+                                    value="{{ vet_check.temperature|default_if_none:'' }}" step="0.1" min="35" max="42">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="weight" class="form-label">Peso (kg)</label>
+                                <input type="number" class="form-control" id="weight" name="weight" 
+                                    value="{{ vet_check.weight|default_if_none:'' }}" step="0.01" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="heart_rate" class="form-label">Ritmo cardíaco (lpm)</label>
+                                <input type="number" class="form-control" id="heart_rate" name="heart_rate" 
+                                    value="{{ vet_check.heart_rate|default_if_none:'' }}" min="0" max="300">
+                            </div>
+                        </div>
+                        
+                        <!-- Evaluación física -->
+                        <h4 class="mb-3">Evaluación Física</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="physical_condition" class="form-label">Condición física</label>
+                                <select class="form-select" id="physical_condition" name="physical_condition">
+                                    <option value="">-- Seleccionar --</option>
+                                    {% for value, text in condition_choices %}
+                                    <option value="{{ value }}" {% if vet_check.physical_condition == value %}selected{% endif %}>
+                                        {{ text }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="hydration_status" class="form-label">Estado de hidratación</label>
+                                <select class="form-select" id="hydration_status" name="hydration_status">
+                                    <option value="">-- Seleccionar --</option>
+                                    {% for value, text in condition_choices %}
+                                    <option value="{{ value }}" {% if vet_check.hydration_status == value %}selected{% endif %}>
+                                        {{ text }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Revisión de sistemas -->
+                        <h4 class="mb-3">Revisión de Sistemas</h4>
+                        
+                        <!-- Lesiones/heridas -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="has_injuries" name="has_injuries" 
+                                    {% if vet_check.has_injuries %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="has_injuries">Presenta heridas o lesiones</label>
+                            </div>
+                            <div class="collapse {% if vet_check.has_injuries %}show{% endif %}" id="injuries_detail">
+                                <textarea class="form-control" id="injury_details" name="injury_details" rows="2"
+                                    placeholder="Describa las lesiones observadas...">{{ vet_check.injury_details }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Problemas respiratorios -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="has_respiratory_issues" name="has_respiratory_issues" 
+                                    {% if vet_check.has_respiratory_issues %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="has_respiratory_issues">Problemas respiratorios</label>
+                            </div>
+                            <div class="collapse {% if vet_check.has_respiratory_issues %}show{% endif %}" id="respiratory_detail">
+                                <textarea class="form-control" id="respiratory_details" name="respiratory_details" rows="2"
+                                    placeholder="Describa los problemas respiratorios...">{{ vet_check.respiratory_details }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Problemas musculoesqueléticos -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="has_musculoskeletal_issues" name="has_musculoskeletal_issues" 
+                                    {% if vet_check.has_musculoskeletal_issues %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="has_musculoskeletal_issues">Problemas musculoesqueléticos</label>
+                            </div>
+                            <div class="collapse {% if vet_check.has_musculoskeletal_issues %}show{% endif %}" id="musculoskeletal_detail">
+                                <textarea class="form-control" id="musculoskeletal_details" name="musculoskeletal_details" rows="2"
+                                    placeholder="Describa los problemas musculoesqueléticos...">{{ vet_check.musculoskeletal_details }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Verificación de vacunas -->
+                        <h4 class="mb-3">Vacunación</h4>
+                        <div class="mb-4">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="vaccines_verified" name="vaccines_verified" 
+                                    {% if vet_check.vaccines_verified %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="vaccines_verified">Vacunas verificadas y al día</label>
+                            </div>
+                            <div class="mt-2">
+                                <textarea class="form-control" id="vaccines_notes" name="vaccines_notes" rows="2"
+                                    placeholder="Notas sobre las vacunas...">{{ vet_check.vaccines_notes }}</textarea>
+                            </div>
+                            <div class="mt-2">
+                                <a href="{% url 'veterinary:vaccination_record' registration_id=registration.id %}" class="btn btn-sm btn-outline-primary">
+                                    Gestionar registro de vacunas
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Recomendaciones y notas generales -->
+                        <h4 class="mb-3">Evaluación y Recomendaciones</h4>
+                        <div class="mb-3">
+                            <label for="general_notes" class="form-label">Notas generales</label>
+                            <textarea class="form-control" id="general_notes" name="general_notes" rows="3">{{ vet_check.general_notes }}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="recommendations" class="form-label">Recomendaciones</label>
+                            <textarea class="form-control" id="recommendations" name="recommendations" rows="3">{{ vet_check.recommendations }}</textarea>
+                        </div>
+                        
+                        <!-- Crear alerta médica -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="create_alert" name="create_alert" value="yes">
+                                <label class="form-check-label fw-bold" for="create_alert">Crear alerta médica</label>
+                            </div>
+                            <div class="collapse" id="alert_details">
+                                <div class="card card-body">
+                                    <div class="mb-3">
+                                        <label for="alert_priority" class="form-label">Prioridad</label>
+                                        <select class="form-select" id="alert_priority" name="alert_priority">
+                                            {% for value, text in priority_choices %}
+                                            <option value="{{ value }}">{{ text }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="alert_description" class="form-label">Descripción de la alerta</label>
+                                        <textarea class="form-control" id="alert_description" name="alert_description" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="requires_followup" name="requires_followup">
+                                            <label class="form-check-label" for="requires_followup">Requiere seguimiento posterior</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="notify_staff" name="notify_staff">
+                                            <label class="form-check-label" for="notify_staff">Notificar a staff del evento</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado final -->
+                        <h4 class="mb-3">Decisión Final</h4>
+                        <div class="mb-4">
+                            <label for="status" class="form-label">Estado de la revisión</label>
+                            <select class="form-select form-select-lg" id="status" name="status" required>
+                                {% for value, text in status_choices %}
+                                <option value="{{ value }}" {% if vet_check.status == value %}selected{% endif %}>
+                                    {{ text }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" name="save" class="btn btn-primary me-md-2">Guardar</button>
+                            <button type="submit" name="save_next" class="btn btn-success">Guardar y revisar siguiente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    // Mostrar/ocultar detalles de lesiones
+    document.getElementById('has_injuries').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('injuries_detail').classList.add('show');
+        } else {
+            document.getElementById('injuries_detail').classList.remove('show');
+        }
+    });
+    
+    // Mostrar/ocultar detalles respiratorios
+    document.getElementById('has_respiratory_issues').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('respiratory_detail').classList.add('show');
+        } else {
+            document.getElementById('respiratory_detail').classList.remove('show');
+        }
+    });
+    
+    // Mostrar/ocultar detalles musculoesqueléticos
+    document.getElementById('has_musculoskeletal_issues').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('musculoskeletal_detail').classList.add('show');
+        } else {
+            document.getElementById('musculoskeletal_detail').classList.remove('show');
+        }
+    });
+    
+    // Mostrar/ocultar detalles de alerta
+    document.getElementById('create_alert').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('alert_details').classList.add('show');
+        } else {
+            document.getElementById('alert_details').classList.remove('show');
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

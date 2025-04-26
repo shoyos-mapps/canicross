@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Crear Alerta Médica - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Crear Alerta Médica</h1>
+            <p class="lead">{{ vet_check.dog.name }} - {{ vet_check.registration.participant.first_name }} {{ vet_check.registration.participant.last_name }}</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group">
+                <a href="{% url 'veterinary:medical_history' dog_id=vet_check.dog.id %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Volver al Historial
+                </a>
+                <a href="{% url 'veterinary:check' registration_id=vet_check.registration.id %}" class="btn btn-outline-info">
+                    <i class="bi bi-clipboard-data"></i> Ver Revisión
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Formulario de Alerta Médica</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        
+                        <!-- Prioridad de la alerta -->
+                        <div class="mb-3">
+                            <label for="priority" class="form-label">Prioridad</label>
+                            <select class="form-select" id="priority" name="priority" required>
+                                {% for value, text in priority_choices %}
+                                <option value="{{ value }}">{{ text }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Seleccione la prioridad según la urgencia y gravedad de la alerta.</div>
+                        </div>
+                        
+                        <!-- Descripción de la alerta -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required></textarea>
+                            <div class="form-text">Describa el problema o la situación que requiere seguimiento.</div>
+                        </div>
+                        
+                        <!-- Opciones adicionales -->
+                        <div class="mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="requires_followup" name="requires_followup">
+                                <label class="form-check-label" for="requires_followup">
+                                    Requiere seguimiento posterior
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notify_staff" name="notify_staff">
+                                <label class="form-check-label" for="notify_staff">
+                                    Notificar al personal del evento
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" name="save" class="btn btn-primary me-md-2">Guardar</button>
+                            <button type="submit" name="save_view" class="btn btn-success">Guardar y ver detalles</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

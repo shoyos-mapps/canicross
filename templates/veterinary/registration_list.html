@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lista de Inscripciones - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Inscripciones para Revisión</h1>
+            <p class="lead">Gestione las revisiones veterinarias para los participantes.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group mb-2">
+                <a href="{% url 'veterinary:dashboard' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                </a>
+                <a href="{% url 'veterinary:alerts' %}" class="btn btn-outline-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Alertas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Filtros y selector de evento -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Filtros de búsqueda</h5>
+                    <form method="get" action="" class="row g-3">
+                        <div class="col-md-5">
+                            <label for="event" class="form-label">Evento</label>
+                            <select name="event" id="event" class="form-select">
+                                {% for event in active_events %}
+                                <option value="{{ event.id }}" {% if selected_event.id == event.id %}selected{% endif %}>
+                                    {{ event.name }} ({{ event.start_date|date:"d/m/Y" }})
+                                </option>
+                                {% empty %}
+                                <option value="">No hay eventos activos</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="status" class="form-label">Estado</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="pending" {% if check_status == 'pending' %}selected{% endif %}>Pendientes de revisión</option>
+                                <option value="approved" {% if check_status == 'approved' %}selected{% endif %}>Aprobados</option>
+                                <option value="rejected" {% if check_status == 'rejected' %}selected{% endif %}>Rechazados</option>
+                                <option value="conditional" {% if check_status == 'conditional' %}selected{% endif %}>Aprobados con condiciones</option>
+                                <option value="all" {% if check_status == 'all' %}selected{% endif %}>Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 align-self-end">
+                            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de inscripciones -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        {% if selected_event %}
+                        Inscripciones: {{ selected_event.name }}
+                        {% else %}
+                        Todas las inscripciones
+                        {% endif %}
+                    </h5>
+                    <span class="badge bg-primary">{{ registrations|length }} resultado(s)</span>
+                </div>
+                <div class="card-body">
+                    {% if registrations %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Participante</th>
+                                    <th>Perro</th>
+                                    <th>Carrera</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in registrations %}
+                                <tr>
+                                    <td>{{ reg.bib_number|default:"--" }}</td>
+                                    <td>{{ reg.participant.first_name }} {{ reg.participant.last_name }}</td>
+                                    <td>
+                                        <a href="{% url 'veterinary:medical_history' dog_id=reg.dog.id %}" title="Ver historial médico">
+                                            {{ reg.dog.name }} ({{ reg.dog.breed }})
+                                        </a>
+                                    </td>
+                                    <td>{{ reg.race.name }}</td>
+                                    <td>
+                                        {% if reg.vet_check_status == 'approved' %}
+                                        <span class="badge bg-success">Aprobado</span>
+                                        {% elif reg.vet_check_status == 'rejected' %}
+                                        <span class="badge bg-danger">Rechazado</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'veterinary:check' registration_id=reg.id %}" class="btn btn-sm btn-primary">
+                                                {% if reg.vet_check_status == 'pending' %}
+                                                Revisar
+                                                {% else %}
+                                                Ver revisión
+                                                {% endif %}
+                                            </a>
+                                            <a href="{% url 'veterinary:vaccination_record' registration_id=reg.id %}" class="btn btn-sm btn-outline-success">Vacunas</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay inscripciones que coincidan con los criterios de búsqueda.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

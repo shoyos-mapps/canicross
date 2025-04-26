@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel de Veterinaria - Canicross{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="mb-3">Panel de Veterinaria</h1>
+            <p class="lead">Bienvenido al área de revisión veterinaria de Canicross.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <div class="btn-group">
+                <a href="{% url 'veterinary:registrations' %}" class="btn btn-primary">Ver todas las inscripciones</a>
+                <a href="{% url 'veterinary:alerts' %}" class="btn btn-outline-primary">Ver alertas médicas</a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Selector de evento -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Seleccionar Evento</h5>
+                    <form method="get" action="" class="row g-2">
+                        <div class="col-sm-8">
+                            <select name="event" class="form-select">
+                                {% for event in active_events %}
+                                <option value="{{ event.id }}" {% if selected_event.id == event.id %}selected{% endif %}>
+                                    {{ event.name }} ({{ event.start_date|date:"d/m/Y" }} al {{ event.end_date|date:"d/m/Y" }})
+                                </option>
+                                {% empty %}
+                                <option value="">No hay eventos activos</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if selected_event %}
+    <!-- Resumen estadístico -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Estadísticas de {{ selected_event.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card text-center h-100 border-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pendientes</h5>
+                                    <p class="card-text display-4">{{ stats.pending }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card text-center h-100 border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title">Aprobados</h5>
+                                    <p class="card-text display-4">{{ stats.approved }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+                            <div class="card text-center h-100 border-danger">
+                                <div class="card-body">
+                                    <h5 class="card-title">Rechazados</h5>
+                                    <p class="card-text display-4">{{ stats.rejected }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card text-center h-100 border-info">
+                                <div class="card-body">
+                                    <h5 class="card-title">Condicionales</h5>
+                                    <p class="card-text display-4">{{ stats.conditional }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    Total de inscripciones: {{ stats.total }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Inscripciones pendientes -->
+        <div class="col-lg-7 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Revisiones Pendientes</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_registrations %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Participante</th>
+                                    <th>Perro</th>
+                                    <th>Carrera</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in pending_registrations %}
+                                <tr>
+                                    <td>{{ reg.bib_number|default:"--" }}</td>
+                                    <td>{{ reg.participant.first_name }} {{ reg.participant.last_name }}</td>
+                                    <td>{{ reg.dog.name }} ({{ reg.dog.breed }})</td>
+                                    <td>{{ reg.race.name }}</td>
+                                    <td>
+                                        <a href="{% url 'veterinary:check' registration_id=reg.id %}" class="btn btn-sm btn-primary">Revisar</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay revisiones pendientes para este evento.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'veterinary:registrations' %}?status=pending&event={{ selected_event.id }}" class="btn btn-outline-primary">Ver todas las pendientes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas activas -->
+        <div class="col-lg-5 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Alertas Médicas Activas</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_alerts %}
+                    <div class="list-group">
+                        {% for alert in active_alerts %}
+                        <a href="{% url 'veterinary:alert_detail' alert_id=alert.id %}" class="list-group-item list-group-item-action 
+                            {% if alert.priority == 'critical' %}list-group-item-danger{% elif alert.priority == 'high' %}list-group-item-warning{% endif %}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ alert.veterinary_check.dog.name }} - {{ alert.get_priority_display }}</h6>
+                                <small>{{ alert.created_at|date:"d/m H:i" }}</small>
+                            </div>
+                            <p class="mb-1">{{ alert.description|truncatechars:100 }}</p>
+                            <small>Estado: {{ alert.get_status_display }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success mb-0">
+                        No hay alertas médicas activas.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'veterinary:alerts' %}" class="btn btn-outline-warning">Ver todas las alertas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revisiones recientes -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Revisiones Recientes</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_checks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Perro</th>
+                                    <th>Propietario</th>
+                                    <th>Veterinario</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for check in recent_checks %}
+                                <tr>
+                                    <td>{{ check.dog.name }}</td>
+                                    <td>{{ check.registration.participant.first_name }} {{ check.registration.participant.last_name }}</td>
+                                    <td>{{ check.veterinarian.get_full_name }}</td>
+                                    <td>
+                                        {% if check.status == 'approved' %}
+                                        <span class="badge bg-success">Aprobado</span>
+                                        {% elif check.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rechazado</span>
+                                        {% elif check.status == 'conditional' %}
+                                        <span class="badge bg-info">Condicional</span>
+                                        {% elif check.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                        {% elif check.status == 'in_progress' %}
+                                        <span class="badge bg-secondary">En revisión</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ check.check_time|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'veterinary:check' registration_id=check.registration.id %}" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay revisiones recientes para este evento.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-warning">
+                No hay eventos activos o seleccionados. Por favor, seleccione un evento para ver las revisiones veterinarias.
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

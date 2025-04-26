@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registro de Vacunación - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Registro de Vacunación</h1>
+            <p class="lead">{{ registration.dog.name }} - {{ registration.participant.first_name }} {{ registration.participant.last_name }}</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group">
+                <a href="{% url 'veterinary:check' registration_id=registration.id %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Volver a Revisión
+                </a>
+                <a href="{% url 'veterinary:medical_history' dog_id=registration.dog.id %}" class="btn btn-outline-info">
+                    <i class="bi bi-clipboard-data"></i> Historial Médico
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Formulario para añadir vacuna -->
+        <div class="col-md-5 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Añadir Vacuna</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="add_vaccine" value="1">
+                        
+                        <div class="mb-3">
+                            <label for="vaccine_name" class="form-label">Nombre de la vacuna</label>
+                            <input type="text" class="form-control" id="vaccine_name" name="vaccine_name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="administration_date" class="form-label">Fecha de administración</label>
+                            <input type="date" class="form-control" id="administration_date" name="administration_date" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="expiry_date" class="form-label">Fecha de expiración</label>
+                            <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="batch_number" class="form-label">Número de lote (opcional)</label>
+                            <input type="text" class="form-control" id="batch_number" name="batch_number">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notas (opcional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Añadir Vacuna</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de vacunas registradas -->
+        <div class="col-md-7 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Vacunas Registradas</h5>
+                    <span class="badge bg-primary">{{ vaccination_records|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if vaccination_records %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Vacuna</th>
+                                    <th>Fecha Administración</th>
+                                    <th>Expiración</th>
+                                    <th>Lote</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vac in vaccination_records %}
+                                <tr>
+                                    <td>{{ vac.vaccine_name }}</td>
+                                    <td>{{ vac.administration_date|date:"d/m/Y" }}</td>
+                                    <td>{{ vac.expiry_date|date:"d/m/Y"|default:"-" }}</td>
+                                    <td>{{ vac.batch_number|default:"-" }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ vac.id }}">
+                                            Eliminar
+                                        </button>
+                                        <!-- Modal de confirmación -->
+                                        <div class="modal fade" id="deleteModal{{ vac.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ vac.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ vac.id }}">Confirmar eliminación</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        ¿Está seguro de que desea eliminar la vacuna <strong>{{ vac.vaccine_name }}</strong>?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <form method="post" action="">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="delete_vaccine" value="1">
+                                                            <input type="hidden" name="vaccine_id" value="{{ vac.id }}">
+                                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay vacunas registradas para este perro.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'veterinary:check' registration_id=registration.id %}" class="btn btn-outline-primary">
+                            Volver a la revisión veterinaria
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

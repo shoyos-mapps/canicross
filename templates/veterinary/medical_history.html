@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Historial Médico - {{ dog.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Historial Médico</h1>
+            <p class="lead">{{ dog.name }} ({{ dog.breed }}) - Propietario: {{ dog.owner.first_name }} {{ dog.owner.last_name }}</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="btn-group">
+                <a href="{% url 'veterinary:dashboard' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <a href="{% url 'veterinary:alerts' %}" class="btn btn-outline-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Alertas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Información del perro -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Información del Perro</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Nombre:</span>
+                            <span>{{ dog.name }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Raza:</span>
+                            <span>{{ dog.breed }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Sexo:</span>
+                            <span>{{ dog.get_gender_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Fecha Nacimiento:</span>
+                            <span>{{ dog.date_of_birth|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Edad:</span>
+                            <span>{{ dog.get_age|default:"-" }} años</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Microchip:</span>
+                            <span>{{ dog.microchip_number|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Cartilla Veterinaria:</span>
+                            <span>{{ dog.veterinary_book_number|default:"-" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Propietario:</span>
+                            <span>{{ dog.owner.first_name }} {{ dog.owner.last_name }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de revisiones -->
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Historial de Revisiones Veterinarias</h5>
+                </div>
+                <div class="card-body">
+                    {% if checks %}
+                    <div class="accordion" id="accordionChecks">
+                        {% for check in checks %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ check.id }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ check.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" 
+                                    aria-controls="collapse{{ check.id }}">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <div>
+                                            <span class="fw-bold">{{ check.check_time|date:"d/m/Y H:i" }}</span> 
+                                            - {{ check.registration.race.event.name }}
+                                        </div>
+                                        <div>
+                                            {% if check.status == 'approved' %}
+                                            <span class="badge bg-success ms-2">Aprobado</span>
+                                            {% elif check.status == 'rejected' %}
+                                            <span class="badge bg-danger ms-2">Rechazado</span>
+                                            {% elif check.status == 'conditional' %}
+                                            <span class="badge bg-info ms-2">Condicional</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary ms-2">{{ check.get_status_display }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ check.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                aria-labelledby="heading{{ check.id }}" data-bs-parent="#accordionChecks">
+                                <div class="accordion-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <p class="mb-1"><strong>Veterinario:</strong> {{ check.veterinarian.get_full_name }}</p>
+                                            <p class="mb-1"><strong>Evento:</strong> {{ check.registration.race.event.name }}</p>
+                                            <p class="mb-1"><strong>Carrera:</strong> {{ check.registration.race.name }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="mb-1"><strong>Temperatura:</strong> {{ check.temperature|default:"-" }} °C</p>
+                                            <p class="mb-1"><strong>Peso:</strong> {{ check.weight|default:"-" }} kg</p>
+                                            <p class="mb-1"><strong>Ritmo cardíaco:</strong> {{ check.heart_rate|default:"-" }} lpm</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="mb-1"><strong>Condición física:</strong> 
+                                                {% if check.physical_condition %}
+                                                {{ check.get_physical_condition_display }}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                            </p>
+                                            <p class="mb-1"><strong>Hidratación:</strong> 
+                                                {% if check.hydration_status %}
+                                                {{ check.get_hydration_status_display }}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                            </p>
+                                            <p class="mb-1"><strong>Vacunas verificadas:</strong> 
+                                                {% if check.vaccines_verified %}
+                                                <span class="badge bg-success">Sí</span>
+                                                {% else %}
+                                                <span class="badge bg-warning text-dark">No</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {% if check.has_injuries or check.has_respiratory_issues or check.has_musculoskeletal_issues %}
+                                    <div class="alert alert-warning mb-3">
+                                        <h6 class="alert-heading fw-bold">Problemas detectados:</h6>
+                                        <ul class="mb-0">
+                                            {% if check.has_injuries %}
+                                            <li><strong>Lesiones:</strong> {{ check.injury_details }}</li>
+                                            {% endif %}
+                                            {% if check.has_respiratory_issues %}
+                                            <li><strong>Problemas respiratorios:</strong> {{ check.respiratory_details }}</li>
+                                            {% endif %}
+                                            {% if check.has_musculoskeletal_issues %}
+                                            <li><strong>Problemas musculoesqueléticos:</strong> {{ check.musculoskeletal_details }}</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if check.general_notes %}
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">Notas generales:</h6>
+                                        <p class="mb-0">{{ check.general_notes }}</p>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if check.recommendations %}
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">Recomendaciones:</h6>
+                                        <p class="mb-0">{{ check.recommendations }}</p>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="mt-3">
+                                        <a href="{% url 'veterinary:check' registration_id=check.registration.id %}" class="btn btn-sm btn-outline-primary">
+                                            Ver detalles completos
+                                        </a>
+                                        <a href="{% url 'veterinary:create_alert' check_id=check.id %}" class="btn btn-sm btn-outline-warning">
+                                            Crear alerta
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay revisiones veterinarias registradas para este perro.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas médicas -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Alertas Médicas</h5>
+                    <span class="badge bg-primary">{{ alerts|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if alerts %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Evento</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Descripción</th>
+                                    <th>Creada por</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alert in alerts %}
+                                <tr class="{% if alert.priority == 'critical' %}table-danger{% elif alert.priority == 'high' %}table-warning{% endif %}">
+                                    <td>{{ alert.created_at|date:"d/m/Y" }}</td>
+                                    <td>{{ alert.veterinary_check.registration.race.event.name }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if alert.priority == 'critical' %}bg-danger
+                                            {% elif alert.priority == 'high' %}bg-warning text-dark
+                                            {% elif alert.priority == 'medium' %}bg-info text-dark
+                                            {% else %}bg-success
+                                            {% endif %}">
+                                            {{ alert.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if alert.status == 'active' %}bg-danger
+                                            {% elif alert.status == 'monitoring' %}bg-warning text-dark
+                                            {% elif alert.status == 'resolved' %}bg-success
+                                            {% else %}bg-secondary
+                                            {% endif %}">
+                                            {{ alert.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ alert.description|truncatechars:50 }}</td>
+                                    <td>{{ alert.created_by.get_full_name }}</td>
+                                    <td>
+                                        <a href="{% url 'veterinary:alert_detail' alert_id=alert.id %}" class="btn btn-sm btn-primary">Ver</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        No hay alertas médicas registradas para este perro.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from events.models import Race
 from registrations.models import Registration
-from results.models import RaceResult
+from results.models import Result
 from django.utils import timezone
 
 @login_required
@@ -28,17 +28,16 @@ def start_race(request, race_id):
         
         for registration in checked_in_registrations:
             # Create or update the result
-            result, created = RaceResult.objects.get_or_create(
+            result, created = Result.objects.get_or_create(
                 registration=registration,
                 defaults={
-                    'start_time': race.actual_start_time,
-                    'status': 'in_progress'
+                    'status': 'draft',
+                    'recorded_by': request.user
                 }
             )
             
             if not created:
-                result.start_time = race.actual_start_time
-                result.status = 'in_progress'
+                result.status = 'draft'
                 result.save()
         
         return redirect('race_management:dashboard')
@@ -55,18 +54,22 @@ def finish_participant(request, race_id):
         
         try:
             registration = Registration.objects.get(race=race, bib_number=bib_number)
-            result, created = RaceResult.objects.get_or_create(
+            result, created = Result.objects.get_or_create(
                 registration=registration,
-                defaults={'status': 'finished'}
+                defaults={
+                    'status': 'pending', 
+                    'recorded_by': request.user,
+                    'recorded_at': timezone.now()
+                }
             )
             
-            result.finish_time = timezone.now()
-            result.status = 'finished'
+            result.status = 'pending'
             
-            # Calculate time
-            if race.actual_start_time and result.finish_time:
-                result.base_time = result.finish_time - race.actual_start_time
-                result.official_time = result.base_time  # Will be adjusted for penalties later
+            # Calculate time difference in seconds from race start
+            if race.actual_start_time:
+                now = timezone.now()
+                time_diff = (now - race.actual_start_time).total_seconds()
+                result.official_time_seconds = int(time_diff)
             
             result.save()
             
