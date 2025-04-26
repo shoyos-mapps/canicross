@@ -642,6 +642,19 @@ def main():
     print_group_permissions(participant_group)
     print_group_permissions(volunteer_group)
     
+    # Proteger los permisos del grupo de administradores
+    try:
+        from utils.admin_permissions_lock import protect_current_admin_permissions, with_protection_disabled
+        
+        # Desactivamos la protección mientras se ejecuta el script
+        with with_protection_disabled():
+            result = protect_current_admin_permissions()
+            print(f"\n{result}")
+            print("Los permisos del grupo 'Administradores' han sido bloqueados y no podrán ser modificados.")
+    except ImportError:
+        print("\nADVERTENCIA: No se pudo proteger los permisos de administrador.")
+        print("Asegúrese de que el módulo 'utils.admin_permissions_lock' esté disponible.")
+    
     print("\nConfiguración de permisos completada correctamente.")
 
 if __name__ == "__main__":

@@ -1,6 +1,12 @@
 from django.urls import path
 from . import views
 
+# NOTA: Este módulo se incluye en dos rutas diferentes:
+# 1. /events/ con namespace 'events'
+# 2. / (raíz) con namespace 'events_home'
+# Por esta razón, cualquier plantilla que use {% url %} debe especificar
+# el namespace completo, por ejemplo: {% url 'events:event_list' %} o {% url 'events_home:event_list' %}
+
 app_name = 'events'
 
 urlpatterns = [

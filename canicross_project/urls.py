@@ -30,8 +30,8 @@ urlpatterns = [
     path('race-management/', include('race_management.urls')),
     path('results/', include('results.urls')),
     
-    # Home page
-    path('', include('events.urls')),
+    # Home page - usar un namespace diferente para evitar conflicto
+    path('', include('events.urls', namespace='events_home')),
 ]
 
 # Serve media files in development
