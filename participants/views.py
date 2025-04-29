@@ -1,17 +1,37 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from .models import Participant, Dog
 from .forms import ParticipantForm, DogForm
 from registrations.models import Registration
 from utils.logger import get_logger, log_function_call, log_exception
+from accounts.decorators import admin_required, staff_required
 
 logger = get_logger('participants')
 
+@login_required
+@staff_required
 def participant_list(request):
-    # Simple placeholder view
-    participants = Participant.objects.all()
-    return render(request, 'participants/participant_list.html', {'participants': participants})
+    """
+    Vista para listar todos los participantes.
+    Solo accesible para admins y staff.
+    """
+    try:
+        # Obtener todos los participantes con sus datos relacionados
+        participants = Participant.objects.all().prefetch_related(
+            'dogs',
+            Prefetch('registrations', queryset=Registration.objects.select_related('race', 'race__event', 'dog'))
+        ).order_by('participant_number', 'last_name', 'first_name')
+        
+        return render(request, 'participants/participant_list.html', {
+            'participants': participants,
+            'title': 'Lista de Participantes'
+        })
+    except Exception as e:
+        log_exception(logger, f"Error al listar participantes: {str(e)}")
+        messages.error(request, "Hubo un error al cargar la lista de participantes.")
+        return redirect('admin:index')
 
 @login_required
 @log_function_call(logger)

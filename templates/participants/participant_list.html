@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Participantes - Canicross{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5">Lista de Participantes</h1>
+            <p class="lead">Todos los participantes registrados en el sistema.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">Participantes</h5>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar participantes...">
+                        <button id="searchBtn" class="btn btn-primary">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Documento</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Ciudad</th>
+                            <th>Perros</th>
+                            <th>Inscripciones</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participant in participants %}
+                        <tr data-participant-id="{{ participant.id }}">
+                            <td>{{ participant.participant_number|default:"-" }}</td>
+                            <td>{{ participant.full_name }}</td>
+                            <td>{{ participant.id_document|default:"-" }}</td>
+                            <td>{{ participant.email|default:"-" }}</td>
+                            <td>{{ participant.phone|default:"-" }}</td>
+                            <td>{{ participant.city|default:"-" }}</td>
+                            <td>{{ participant.dogs.count }}</td>
+                            <td>{{ participant.registrations.count }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary view-details-btn" data-participant-id="{{ participant.id }}">
+                                    Ver
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="participant-details-row d-none" id="details-{{ participant.id }}">
+                            <td colspan="9">
+                                <div class="card border-0">
+                                    <div class="card-body bg-light">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h5>Información Personal</h5>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <th>Número:</th>
+                                                        <td>{{ participant.participant_number|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Nombre Completo:</th>
+                                                        <td>{{ participant.full_name }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Documento:</th>
+                                                        <td>{{ participant.id_document|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Género:</th>
+                                                        <td>{{ participant.get_gender_display|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Email:</th>
+                                                        <td>{{ participant.email|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Teléfono:</th>
+                                                        <td>{{ participant.phone|default:"-" }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h5>Dirección</h5>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <th>Dirección:</th>
+                                                        <td>{{ participant.address|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Ciudad:</th>
+                                                        <td>{{ participant.city|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Código Postal:</th>
+                                                        <td>{{ participant.postal_code|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Provincia/Estado:</th>
+                                                        <td>{{ participant.state_province|default:"-" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>País:</th>
+                                                        <td>{{ participant.country|default:"-" }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        {% if participant.dogs.exists %}
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <h5>Perros</h5>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Nombre</th>
+                                                            <th>Raza</th>
+                                                            <th>Microchip</th>
+                                                            <th>Edad</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for dog in participant.dogs.all %}
+                                                        <tr>
+                                                            <td>{{ dog.name }}</td>
+                                                            <td>{{ dog.breed }}</td>
+                                                            <td>{{ dog.microchip_number|default:"-" }}</td>
+                                                            <td>{{ dog.get_age|default:"-" }} años</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if participant.registrations.exists %}
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <h5>Inscripciones</h5>
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Evento</th>
+                                                            <th>Carrera</th>
+                                                            <th>Dorsal</th>
+                                                            <th>Perro</th>
+                                                            <th>Estado</th>
+                                                            <th>Pago</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for reg in participant.registrations.all %}
+                                                        <tr>
+                                                            <td>{{ reg.race.event.name }}</td>
+                                                            <td>{{ reg.race.name }}</td>
+                                                            <td>{{ reg.bib_number|default:"-" }}</td>
+                                                            <td>{{ reg.dog.name }}</td>
+                                                            <td>
+                                                                <span class="badge {% if reg.registration_status == 'confirmed' %}bg-success{% elif reg.registration_status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                                    {{ reg.get_registration_status_display }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge {% if reg.payment_status == 'paid' %}bg-success{% elif reg.payment_status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                                    {{ reg.get_payment_status_display }}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <p class="mb-0">No hay participantes registrados en el sistema.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Manejar clic en botones "Ver"
+        const viewButtons = document.querySelectorAll('.view-details-btn');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const participantId = this.getAttribute('data-participant-id');
+                const detailsRow = document.getElementById(`details-${participantId}`);
+                
+                // Cerrar todas las filas de detalles
+                document.querySelectorAll('.participant-details-row').forEach(row => {
+                    if (row.id !== `details-${participantId}`) {
+                        row.classList.add('d-none');
+                    }
+                });
+                
+                // Abrir o cerrar la fila de detalles clickeada
+                detailsRow.classList.toggle('d-none');
+            });
+        });
+        
+        // Búsqueda de participantes
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll('tr[data-participant-id]');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const detailsRow = document.getElementById(`details-${row.getAttribute('data-participant-id')}`);
+                
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                    if (detailsRow) {
+                        detailsRow.style.display = detailsRow.classList.contains('d-none') ? 'none' : '';
+                    }
+                } else {
+                    row.style.display = 'none';
+                    if (detailsRow) {
+                        detailsRow.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    });
+</script>
+{% endblock %}

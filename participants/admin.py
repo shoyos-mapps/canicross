@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.db.models import Count, Max
+from django.core.exceptions import NoReverseMatch
 
 from .models import Participant, Dog
 from veterinary.models import VeterinaryCheck
@@ -34,9 +35,12 @@ class ParticipantAdmin(admin.ModelAdmin):
         """Muestra el número de perros del participante con enlace."""
         count = obj.dogs.count()
         if count:
-            url = reverse('admin:participants_dog_changelist') + f'?owner__id__exact={obj.id}'
-            return format_html('<a href="{}">{} {}</a>', 
-                              url, count, 'perro' if count == 1 else 'perros')
+            try:
+                url = reverse('admin:participants_dog_changelist') + f'?owner__id__exact={obj.id}'
+                return format_html('<a href="{}">{} {}</a>', 
+                                  url, count, 'perro' if count == 1 else 'perros')
+            except NoReverseMatch:
+                return f"{count} {'perro' if count == 1 else 'perros'}"
         return '0 perros'
     
     dogs_count.short_description = 'Perros'
@@ -45,9 +49,19 @@ class ParticipantAdmin(admin.ModelAdmin):
         """Muestra el número de inscripciones del participante con enlace."""
         count = obj.registrations.count()
         if count:
-            url = reverse('admin:registrations_registration_changelist') + f'?participant__id__exact={obj.id}'
-            return format_html('<a href="{}">{} {}</a>', 
-                              url, count, 'inscripción' if count == 1 else 'inscripciones')
+            try:
+                url = reverse('admin:canicross_admin_registrations_registration_changelist') + f'?participant__id__exact={obj.id}'
+                return format_html('<a href="{}">{} {}</a>', 
+                                 url, count, 'inscripción' if count == 1 else 'inscripciones')
+            except NoReverseMatch:
+                # Intentar con formato alternativo (namespace:model_changelist)
+                try:
+                    url = reverse('admin:registrations_registration_changelist') + f'?participant__id__exact={obj.id}'
+                    return format_html('<a href="{}">{} {}</a>', 
+                                     url, count, 'inscripción' if count == 1 else 'inscripciones')
+                except NoReverseMatch:
+                    # Si no se puede resolver la URL, mostrar solo el número sin enlace
+                    return f"{count} {'inscripción' if count == 1 else 'inscripciones'}"
         return '0 inscripciones'
     
     registrations_count.short_description = 'Inscripciones'
@@ -112,9 +126,12 @@ class DogAdmin(admin.ModelAdmin):
     def owner_display(self, obj):
         """Muestra el nombre del propietario con enlace."""
         if obj.owner:
-            url = reverse('admin:participants_participant_change', args=[obj.owner.id])
-            participant_num = f"#{obj.owner.participant_number}" if obj.owner.participant_number else ""
-            return format_html('<a href="{}">{} {}</a>', url, obj.owner.full_name, participant_num)
+            try:
+                url = reverse('admin:participants_participant_change', args=[obj.owner.id])
+                participant_num = f"#{obj.owner.participant_number}" if obj.owner.participant_number else ""
+                return format_html('<a href="{}">{} {}</a>', url, obj.owner.full_name, participant_num)
+            except NoReverseMatch:
+                return f"{obj.owner.full_name} #{obj.owner.participant_number}" if obj.owner.participant_number else obj.owner.full_name
         return '-'
     
     owner_display.short_description = 'Propietario'
@@ -150,9 +167,17 @@ class DogAdmin(admin.ModelAdmin):
         """Muestra el número de inscripciones del perro con enlace."""
         count = obj.registrations.count()
         if count:
-            url = reverse('admin:registrations_registration_changelist') + f'?dog__id__exact={obj.id}'
-            return format_html('<a href="{}">{} {}</a>', 
-                              url, count, 'inscripción' if count == 1 else 'inscripciones')
+            try:
+                url = reverse('admin:canicross_admin_registrations_registration_changelist') + f'?dog__id__exact={obj.id}'
+                return format_html('<a href="{}">{} {}</a>', 
+                                  url, count, 'inscripción' if count == 1 else 'inscripciones')
+            except NoReverseMatch:
+                try:
+                    url = reverse('admin:registrations_registration_changelist') + f'?dog__id__exact={obj.id}'
+                    return format_html('<a href="{}">{} {}</a>', 
+                                     url, count, 'inscripción' if count == 1 else 'inscripciones')
+                except NoReverseMatch:
+                    return f"{count} {'inscripción' if count == 1 else 'inscripciones'}"
         return '0 inscripciones'
     
     registrations_count.short_description = 'Inscripciones'
