@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Inscripciones{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Gestión de Inscripciones</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group" role="group">
+                <a href="{% url 'registrations:bulk_update_payment' %}" class="btn btn-primary">
+                    <i class="fa fa-money-bill"></i> Actualización masiva de pagos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="" class="row g-3">
+                <div class="col-md-4">
+                    <label for="event" class="form-label">Evento</label>
+                    <select class="form-select" id="event" name="event">
+                        <option value="">Todos los eventos</option>
+                        {% for event in events %}
+                            <option value="{{ event.id }}" {% if selected_event == event.id %}selected{% endif %}>
+                                {{ event.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="race" class="form-label">Carrera</label>
+                    <select class="form-select" id="race" name="race">
+                        <option value="">Todas las carreras</option>
+                        {% for race in races %}
+                            <option value="{{ race.id }}" {% if selected_race == race.id %}selected{% endif %}>
+                                {{ race.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Estado de pago</label>
+                    <select class="form-select" id="status" name="payment_status">
+                        <option value="">Todos los estados</option>
+                        {% for value, label in payment_status_choices %}
+                            <option value="{{ value }}" {% if selected_payment_status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="q" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="q" name="q" placeholder="Nombre, dorsal, etc." value="{{ query }}">
+                </div>
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+                    <a href="{% url 'registrations:list' %}" class="btn btn-outline-secondary">Limpiar filtros</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Inscripciones</h5>
+            <span class="badge bg-primary">{{ registrations.count }} resultados</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dorsal</th>
+                            <th>Participante</th>
+                            <th>Perro</th>
+                            <th>Carrera</th>
+                            <th>Categoría</th>
+                            <th>Estado de pago</th>
+                            <th>Importe</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in registrations %}
+                        <tr>
+                            <td>{{ reg.bib_number|default:"--" }}</td>
+                            <td>{{ reg.participant.full_name }}</td>
+                            <td>{{ reg.dog.name }}</td>
+                            <td>{{ reg.race.name }}</td>
+                            <td>{{ reg.race_category.name }}</td>
+                            <td>
+                                <span class="badge {% if reg.payment_status == 'paid' %}bg-success{% elif reg.payment_status == 'pending' %}bg-warning{% elif reg.payment_status == 'refunded' %}bg-info{% else %}bg-danger{% endif %}">
+                                    {{ reg.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>{% if reg.payment_amount %}{{ reg.payment_amount }} €{% else %}--{% endif %}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'registrations:update_payment' reg.id %}" class="btn btn-outline-primary" title="Actualizar pago">
+                                        <i class="fa fa-money-bill"></i>
+                                    </a>
+                                    <a href="{% url 'registrations:confirmation' reg.id %}" class="btn btn-outline-info" title="Ver detalles">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                No se encontraron inscripciones que coincidan con los criterios de búsqueda.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Actualización dinámica de carreras al cambiar el evento
+document.addEventListener('DOMContentLoaded', function() {
+    const eventSelect = document.getElementById('event');
+    const raceSelect = document.getElementById('race');
+    
+    if (eventSelect && raceSelect) {
+        eventSelect.addEventListener('change', function() {
+            // Limpiar selección de carrera actual
+            raceSelect.innerHTML = '<option value="">Todas las carreras</option>';
+            
+            // Si se ha seleccionado un evento, cargar sus carreras
+            const eventId = this.value;
+            if (eventId) {
+                fetch(`/api/events/${eventId}/races/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(race => {
+                            const option = document.createElement('option');
+                            option.value = race.id;
+                            option.textContent = race.name;
+                            raceSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

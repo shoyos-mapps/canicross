@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Actualizar Pago - {{ registration }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Actualizar estado de pago</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Inscripción: {{ registration.participant.full_name }} - {{ registration.race }}</h5>
+                    
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Participante:</strong> {{ registration.participant.full_name }}</p>
+                                <p><strong>Perro:</strong> {{ registration.dog.name }}</p>
+                                <p><strong>Carrera:</strong> {{ registration.race }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Número de dorsal:</strong> {{ registration.bib_number|default:"No asignado" }}</p>
+                                <p><strong>Estado actual:</strong> {{ registration.get_payment_status_display }}</p>
+                                <p><strong>Importe actual:</strong> {% if registration.payment_amount %}{{ registration.payment_amount }} €{% else %}No registrado{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="payment_status" class="form-label">Estado de pago</label>
+                            <select class="form-select" id="payment_status" name="payment_status" required>
+                                <option value="">Seleccionar estado...</option>
+                                {% for value, label in payment_status_choices %}
+                                    <option value="{{ value }}" {% if registration.payment_status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor seleccione un estado de pago.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="payment_amount" class="form-label">Importe pagado (€)</label>
+                            <input type="number" class="form-control" id="payment_amount" name="payment_amount" 
+                                   value="{{ registration.payment_amount|default:'' }}" min="0" step="0.01" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese un importe válido.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Método de pago</label>
+                            <select class="form-select" id="payment_method" name="payment_method" required>
+                                <option value="">Seleccionar método...</option>
+                                <option value="cash" {% if registration.payment_method == 'cash' %}selected{% endif %}>Efectivo</option>
+                                <option value="card" {% if registration.payment_method == 'card' %}selected{% endif %}>Tarjeta</option>
+                                <option value="transfer" {% if registration.payment_method == 'transfer' %}selected{% endif %}>Transferencia</option>
+                                <option value="paypal" {% if registration.payment_method == 'paypal' %}selected{% endif %}>PayPal</option>
+                                <option value="other" {% if registration.payment_method == 'other' %}selected{% endif %}>Otro</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor seleccione un método de pago.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="payment_reference" class="form-label">Referencia de pago (opcional)</label>
+                            <input type="text" class="form-control" id="payment_reference" name="payment_reference" 
+                                   value="{{ registration.payment_reference|default:'' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notas adicionales (opcional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ registration.notes }}</textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'registrations:list' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validación de formulario
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation');
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}
