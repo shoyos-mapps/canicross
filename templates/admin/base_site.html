@@ -1,0 +1,113 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+  :root {
+    --primary: #2c3e50;
+    --secondary: #0275d8;
+    --link-fg: #0275d8;
+    --link-hover-color: #025aa5;
+    --accent: #fd7e14;
+  }
+  
+  #user-tools {
+    font-size: 90%;
+  }
+  
+  .admin-sidebar {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding: 20px 15px;
+    height: 100%;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .admin-sidebar h3 {
+    color: var(--primary);
+    font-size: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .admin-sidebar ul {
+    padding-left: 0;
+    list-style: none;
+  }
+  
+  .admin-sidebar li {
+    margin-bottom: 8px;
+  }
+  
+  .admin-sidebar li a {
+    display: block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: #495057;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  
+  .admin-sidebar li a:hover {
+    background-color: rgba(2, 117, 216, 0.1);
+    color: var(--secondary);
+  }
+  
+  .admin-sidebar li.active a {
+    background-color: var(--secondary);
+    color: white;
+  }
+  
+  .admin-sidebar .icon {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+  }
+  
+  @media (max-width: 767px) {
+    .admin-sidebar {
+      min-height: auto;
+      margin-bottom: 20px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block sidebar %}
+{% if user.is_authenticated and user.is_staff %}
+<div class="admin-sidebar">
+  <h3>Acciones rápidas</h3>
+  <ul>
+    <li><a href="{% url 'admin:index' %}"><span class="icon">📊</span>Panel principal</a></li>
+    <li><a href="{% url 'admin:logs' %}"><span class="icon">📝</span>Visor de logs</a></li>
+    <li><a href="{% url 'admin:payment_list' %}"><span class="icon">💰</span>Gestión de pagos</a></li>
+    <li><a href="{% url 'admin:payment_bulk_update' %}"><span class="icon">💸</span>Pagos masivos</a></li>
+  </ul>
+
+  <h3>Reportes</h3>
+  <ul>
+    <li><a href="{% url 'admin:reports_participants' %}"><span class="icon">👥</span>Participantes</a></li>
+    <li><a href="{% url 'admin:reports_veterinary' %}"><span class="icon">🐾</span>Veterinarios</a></li>
+    <li><a href="{% url 'admin:reports_events' %}"><span class="icon">🏁</span>Eventos</a></li>
+    <li><a href="{% url 'admin:reports_payments' %}"><span class="icon">💵</span>Pagos</a></li>
+  </ul>
+
+  <h3>Gestión</h3>
+  <ul>
+    <li><a href="{% url 'admin:registrations_registration_changelist' %}"><span class="icon">📋</span>Inscripciones</a></li>
+    <li><a href="{% url 'admin:participants_participant_changelist' %}"><span class="icon">🏃</span>Participantes</a></li>
+    <li><a href="{% url 'admin:participants_dog_changelist' %}"><span class="icon">🐕</span>Perros</a></li>
+    <li><a href="{% url 'admin:events_event_changelist' %}"><span class="icon">🗓️</span>Eventos</a></li>
+  </ul>
+</div>
+{% endif %}
+{% endblock %}
