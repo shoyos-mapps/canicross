@@ -8,17 +8,17 @@ from veterinary.models import VeterinaryCheck
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'phone', 'city', 'dogs_count', 'registrations_count', 'payment_status')
+    list_display = ('participant_number', 'first_name', 'last_name', 'email', 'phone', 'city', 'dogs_count', 'registrations_count', 'payment_status')
     list_filter = ('city', 'country', 'user__is_active')
-    search_fields = ('first_name', 'last_name', 'id_document', 'email', 'phone')
-    readonly_fields = ('created_at', 'updated_at', 'user', 'payment_status')
+    search_fields = ('first_name', 'last_name', 'id_document', 'email', 'phone', 'participant_number')
+    readonly_fields = ('created_at', 'updated_at', 'user', 'payment_status', 'participant_number')
     
     fieldsets = (
         ('Información personal', {
-            'fields': ('user', 'first_name', 'last_name', 'id_document', 'date_of_birth', 'gender')
+            'fields': ('user', 'participant_number', 'first_name', 'last_name', 'id_document', 'date_of_birth', 'gender')
         }),
         ('Contacto', {
-            'fields': ('email', 'phone', 'address', 'city', 'state', 'postal_code', 'country')
+            'fields': ('email', 'phone', 'address', 'city', 'state_province', 'postal_code', 'country')
         }),
         ('Emergencia', {
             'fields': ('emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship'),
@@ -87,7 +87,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 class DogAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner_display', 'chip_display', 'breed', 'gender', 'vet_status', 'registrations_count', 'payment_status')
     list_filter = ('gender', 'owner__city', 'breed')
-    search_fields = ('name', 'microchip_number', 'owner__first_name', 'owner__last_name', 'owner__id_document')
+    search_fields = ('name', 'microchip_number', 'owner__first_name', 'owner__last_name', 'owner__id_document', 'owner__participant_number')
     readonly_fields = ('created_at', 'updated_at', 'vet_status', 'payment_status')
     
     fieldsets = (
@@ -113,7 +113,8 @@ class DogAdmin(admin.ModelAdmin):
         """Muestra el nombre del propietario con enlace."""
         if obj.owner:
             url = reverse('admin:participants_participant_change', args=[obj.owner.id])
-            return format_html('<a href="{}">{}</a>', url, obj.owner.full_name)
+            participant_num = f"#{obj.owner.participant_number}" if obj.owner.participant_number else ""
+            return format_html('<a href="{}">{} {}</a>', url, obj.owner.full_name, participant_num)
         return '-'
     
     owner_display.short_description = 'Propietario'

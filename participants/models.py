@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.db.models import Max
 from datetime import date
 
 class Participant(models.Model):
@@ -10,6 +11,7 @@ class Participant(models.Model):
     first_name = models.CharField(max_length=100, verbose_name="Nombre")
     last_name = models.CharField(max_length=100, verbose_name="Apellidos")
     id_document = models.CharField(max_length=20, help_text="DNI, pasaporte u otro documento de identidad", verbose_name="Documento de identidad", blank=True)
+    participant_number = models.PositiveIntegerField(unique=True, verbose_name="Número de participante", editable=False, null=True, blank=True)
     date_of_birth = models.DateField(verbose_name="Fecha de nacimiento", null=True, blank=True)
     GENDER_CHOICES = (
         ('M', 'Masculino'),
@@ -29,10 +31,30 @@ class Participant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
     
+    def save(self, *args, **kwargs):
+        # Generar número de participante automáticamente si no tiene uno
+        if not self.participant_number:
+            # Obtener el máximo número de participante existente
+            max_number = Participant.objects.aggregate(Max('participant_number'))['participant_number__max']
+            # Si no hay participantes, iniciar en 1000, de lo contrario incrementar en 1
+            if max_number is None:
+                self.participant_number = 1000
+            else:
+                self.participant_number = max_number + 1
+        super().save(*args, **kwargs)
+    
     def __str__(self):
+        participant_num = f"#{self.participant_number}" if self.participant_number else ""
+        return f"{self.first_name} {self.last_name} {participant_num}"
+        
+    @property
+    def full_name(self):
+        """Retorna el nombre completo del participante."""
         return f"{self.first_name} {self.last_name}"
     
     def get_age(self):
+        if not self.date_of_birth:
+            return None
         today = date.today()
         return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
         
